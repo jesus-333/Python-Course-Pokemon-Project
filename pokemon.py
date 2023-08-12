@@ -1,4 +1,5 @@
 import numpy as np
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 class Pokemon():
 
@@ -22,6 +23,40 @@ class Pokemon():
             raise ValueError("Duplicate moves")
 
     def use_move(self, idx_move : int, opponent : Pokemon):
+        selected_move = self.moves[idx_move]
+        
+        # Check if there are enough pp
+        if selected_move.pp > 0:
+
+            # Check if the move hit the target
+            if np.random.rand() <= self.accuracy: # Move hit the target
+                # Compute modifier
+                stability = 1.5 if selected_move.type in self.types else 1
+                effect = 1
+                critical = 2 if np.random.rand() < self.base_stats['speed'] / 512 else 1
+                luck = np.random.uniform(0.85, 1)
+                modifier = stability * effect * critical * luck
+                
+                # Get attack and defense
+                attack = self.base_stats['attack'] if selected_move.category == 'physical' else self.base_stats['special']
+                defense = opponent.base_stats['defense'] if selected_move.category == 'physical' else opponent.base_stats['special']
+
+                # Compute damage
+                base_damage = ((2 * level  + 10 ) / 250) * (attack / defense) * selected_move.power + 2
+                damage = np.floor(base_damage * modifier)
+
+                # print("{} hit the {}.".format(selected_move.name, opponent.name))
+            else: # Move fails
+                # print("{} fails".format(selected_move.name))
+                damage = -1
+
+            # Reduce pp
+            selected_move.pp -= 1
+
+        else: # Not enough pp
+            damage = -2
+
+        return selected_move, damage
         
 
 
