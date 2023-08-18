@@ -42,7 +42,7 @@ class Pokemon():
                 defense = opponent.base_stats['defense'] if selected_move.category == 'physical' else opponent.base_stats['special']
 
                 # Compute damage
-                base_damage = ((2 * level  + 10 ) / 250) * (attack / defense) * selected_move.power + 2
+                base_damage = ((2 * self.level  + 10 ) / 250) * (attack / defense) * selected_move.power + 2
                 damage = np.floor(base_damage * modifier)
 
                 # print("{} hit the {}.".format(selected_move.name, opponent.name))
