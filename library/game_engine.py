@@ -4,33 +4,67 @@ from . import Pokemon, Trainer, support
 
 class Game():
 
-    def __init__(self, pokemon_file_path : str, moves_file_path : str):
+    def __init__(self, pokemon_file_path : str, moves_file_path : str, keep_history : bool = False):
         self.df_pokemon = pd.read_json(pokemon_file_path)
         self.df_moves = pd.read_json(moves_file_path)
 
-    def play(self):
         self.create_trainer()
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        self.keep_history = keep_history
 
     def create_trainer(self):
-        support.clear()
+        if not self.keep_history: support.clear()
         trainer_name = input("What is your name?\n")
         
         selected_pokemon = -1
         while selected_pokemon != 1 and selected_pokemon != 2 and selected_pokemon != 3:
-            support.clear()
+            if not self.keep_history: support.clear()
             selected_pokemon = input("\nWhat is your starter?\n\t1) Bulbasaur\n\t2) Charmender\n\t3) Squirtle\n")
             if selected_pokemon.isnumeric(): selected_pokemon = int(selected_pokemon)
 
         if selected_pokemon == 1: starter = self.get_predefined_pokemon('bulbasaur')
         if selected_pokemon == 2: starter = self.get_predefined_pokemon('charmander')
         if selected_pokemon == 3: starter = self.get_predefined_pokemon('squirtle')
-
+        
         self.trainer = Trainer.Trainer(trainer_name, [starter])
+        if not self.keep_history: support.clear()
         print(self.trainer)
 
+        input("Print Enter to continue...")
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    def play_story(self):
+        continute_game = True
+
+        while continute_game:
+            if not self.keep_history: support.clear()
+            next_action = input(self.get_story_menu())
+
+            if next_action.isnumeric():
+                next_action = int(next_action)
+
+                if next_action == 0: continute_game = False
+                elif next_action == 1: self.explore()
+                elif next_action == 2: self.pokemon_center()
+                elif next_action == 3: self.pokemon_store()
+                elif next_action == 4: print(self.trainer)
+                else: print("Action not valid")
+
+                input("Press Enter to continue...")
+
+    def explore(self): 
+        print("You travel around the world")
+
+    def pokemon_center(self): 
+        print("You visit the pokemon center")
+
+    def pokemon_store(self): 
+        print("You visit the pokemon store")
+
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # Methods to get information inside the json file (converted in pandas dataframe)
 
     def get_pokemon_info(self, pokemon_name : str):
         tmp_idx = self.df_pokemon['name'] == pokemon_name
@@ -65,5 +99,16 @@ class Game():
 
         return Pokemon.Pokemon(pokemon_info, moves)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    
+    def get_story_menu(self):
+        menu_string = "Select what you want to do:\n"
+        menu_string += "\t1) Explore\n"
+        menu_string += "\t2) Pokemon center\n"
+        menu_string += "\t3) Pokemon Store\n"
+        menu_string += "\t4) Trainer info\n"
 
+        menu_string += "\n\t0) Pokemon Store\n"
+
+        return menu_string
 
