@@ -1,13 +1,17 @@
 import numpy as np
 
-from . import Pokemon, support
+from . import support
 
 class Battle():
-    def __init__(self, pokemon_1 : "Pokemon" , pokemon_2 : "Pokemon", keep_history : bool = False):
+    def __init__(self, trainer_1, trainer_2, use_ai_player_1 = True, keep_history : bool = False):
         self.keep_history = keep_history
+        self.use_ai_player_1 = use_ai_player_1
 
-        self.pokemon_1 = pokemon_1
-        self.pokemon_2 = pokemon_2
+        self.trainer_1 = trainer_1
+        self.trainer_2 = trainer_2
+
+        self.current_pokemon_1 = self.trainer_1.pokemon_list[0]
+        self.current_pokemon_2 = self.trainer_2.pokemon_list[0]
 
     def battle(self)-> int :
         continue_battle = True
@@ -29,12 +33,19 @@ class Battle():
                 elif int(selected_action) == 3: # Use item
                     pass
                 elif int(selected_action) == 4: # Run away
-                    pass
+                    if np.random.rand() <= 0.6:
+                        print("\nYou ran away")
+                        continue_battle = False
+                        exit_status = 4
+                        continue
+                    else:
+                        print("\n")
                 else:
                     print("Action not valid")
 
                 input("Press Enter to continue...")
             
+        input("The battle is over. Press Enter to continue...")
         return exit_status
 
 
@@ -58,7 +69,7 @@ class Battle():
 
 
     def __get_pokemon_info_string(self, n_pokemon):
-        pokemon = self.pokemon_1 if n_pokemon == 1 else self.pokemon_2
+        pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
         current_hp = pokemon.base_stats['hp']
         max_hp = pokemon.base_stats['max_hp']
 

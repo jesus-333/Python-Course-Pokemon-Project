@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 from . import Pokemon, Trainer, support
+from .Battle import Battle
 
 class Game():
 
@@ -68,10 +69,15 @@ class Game():
         print("\nYou travel around the world")
         
         if np.random.rand() <= self.encounter_prob:
-            print("You find a wild pokemon")
-
+            # Select a random wild pokemon and create a fake trainer
             wild_pokemon = self.get_wild_pokemon()
+            wild_trainer = Trainer.Trainer("Wild pokemon", [wild_pokemon])
+        
+            print("You find a wild pokemon")
             print("The wild pokemon is a wild {}".format(wild_pokemon.name))
+            
+            battle = Battle(self.trainer, wild_trainer)
+            battle.battle()
         else:
             print("You find nothing trainer")
 
