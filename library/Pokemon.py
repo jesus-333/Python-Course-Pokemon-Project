@@ -1,7 +1,3 @@
-import numpy as np
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
 class Pokemon():
 
     def __init__(self, pokemon_info : dict, moves : list):
@@ -9,6 +5,7 @@ class Pokemon():
         self.name = pokemon_info['name']
         self.types = pokemon_info['types']
         self.base_stats = pokemon_info['baseStats']
+        self.base_stats['max_hp'] = self.base_stats['hp']
         
         # self.check_moves(moves)
         # self.moves = moves
@@ -66,7 +63,7 @@ class Pokemon():
 
         return selected_move.name, damage
 
-    def __str__(self):
+    def get_string_description(self, add_moves_info = False):
         tmp_str = ""
         
         tmp_str += 'Pokemon Info:\n'
@@ -76,16 +73,20 @@ class Pokemon():
                 for stats in self.info['pokemon_info']['baseStats']: tmp_str += "\t\t{} : {}\n".format(stats, self.info['pokemon_info']['baseStats'][stats])
             else:
                 tmp_str += "\t{} : {}\n".format(info, self.info['pokemon_info'][info])
-
-        tmp_str += "\n - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
-        tmp_str += "Moves info:\n"
-        for move in self.info['moves_info']:
-            for info in move: 
-                if info != 'effects' and info != 'changes':     
-                    tmp_str += "\t{} : {}\n".format(info, move[info] ) 
-            tmp_str += "\n"
+        
+        if add_moves_info:
+            tmp_str += "\n - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
+            tmp_str += "Moves info:\n"
+            for move in self.info['moves_info']:
+                for info in move: 
+                    if info != 'effects' and info != 'changes':     
+                        tmp_str += "\t{} : {}\n".format(info, move[info] ) 
+                tmp_str += "\n"
 
         return tmp_str
+
+    def __str__(self):
+        return self.get_string_description()
 
 class Move():
     def __init__(self, moves_info : dict):
