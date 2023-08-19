@@ -1,5 +1,6 @@
 import json
 import random
+from os import system, name
 
 from . import Pokemon
 
@@ -87,3 +88,12 @@ def get_started_pokemon(n_starter : int):
 
         return Pokemon.Pokemon(starter_info, moves)
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+def clear():
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
