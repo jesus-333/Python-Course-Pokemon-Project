@@ -78,15 +78,33 @@ def get_started_pokemon(n_starter : int):
     else:
         if n_starter == 1: # Bulbasaur
             starter_info = get_specific_pokemon('bulbasaur')
-            moves = [get_specific_move('tackle'), get_specific_move("razor leaf")]
-        elif n_starter == 2: # Charmender
+            moves = get_preset_moves('bulbasaur')
+        elif n_starter == 2: # Charmander
             starter_info = get_specific_pokemon('charmander')
-            moves = [get_specific_move('tackle'), get_specific_move("ember")]
+            moves = get_preset_moves('charmander')
         elif n_starter == 3: #Squirtle
             starter_info = get_specific_pokemon('squirtle')
-            moves = [get_specific_move('tackle'), get_specific_move("water gun")]
+            moves = get_preset_moves('squirtle')
 
         return Pokemon.Pokemon(starter_info, moves)
+
+def get_preset_moves(pokemon_name : str):
+    """
+    Given a pokemon name return some move(s) already defined
+    """
+    preset_pokemon_moves = dict(
+        bulbasaur = ['tackle', 'razor leaf'],
+        charmander = ['tackle', 'ember'],
+        squirtle = ['tackle', 'water gun'],
+        carterpie = ['twineedle'],
+        pidgey = ['tackle', 'peck'],
+        rattata = ['tackle']
+    )
+    
+    moves = []
+    for move in preset_pokemon_moves[pokemon_name]: moves.append(get_specific_move(move))
+
+    return moves
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
