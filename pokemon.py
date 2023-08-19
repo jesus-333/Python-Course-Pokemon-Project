@@ -3,11 +3,11 @@ import numpy as np
 
 class Pokemon():
 
-    def __init__(self, national_pokedex_number : int, name : str, types : list, base_stats : dict, moves : list):
-        self.national_pokedex_number = national_pokedex_number
-        self.name = name
-        self.types = types
-        self.base_stats = base_stats
+    def __init__(self, pokemon_info : dict, moves : list):
+        self.national_pokedex_number = pokemon_info['national_pokedex_number']
+        self.name = pokemon_info['name']
+        self.types = pokemon_info['types']
+        self.base_stats = pokemon_info['base_stats']
         
         self.check_moves(moves)
         self.moves = moves
@@ -22,7 +22,7 @@ class Pokemon():
         else:
             raise ValueError("Duplicate moves")
 
-    def use_move(self, idx_move : int, opponent : Pokemon):
+    def use_move(self, idx_move : int, opponent : "Pokemon"):
         selected_move = self.moves[idx_move]
         
         # Check if there are enough pp
