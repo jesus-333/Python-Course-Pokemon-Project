@@ -1,3 +1,5 @@
+import support
+import Trainer
 
 def main():
     trainer_name = input("What is your name?\n")
@@ -8,6 +10,11 @@ def main():
 
         if selected_pokemon.isnumeric(): selected_pokemon = int(selected_pokemon)
 
+    starter = support.get_started_pokemon(selected_pokemon)
+    
+    trainer = Trainer.Trainer(trainer_name, [starter])
 
+    print(trainer)
+    
 if __name__ == '__main__':
     main()

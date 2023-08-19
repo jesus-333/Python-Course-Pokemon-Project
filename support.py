@@ -1,7 +1,7 @@
 import json
 import random
 
-import pokemon
+import Pokemon
 
 """
 %load_ext autoreload
@@ -28,13 +28,13 @@ def get_specific_pokemon(pokemon_name : str, pokemon_file_path : str = 'data/pok
 
     raise ValueError("{} was not in the pokemon list of the file {}".format(pokemon_name, pokemon_file_path))
 
-def get_specific_move(move_name: str, move_file_path : str = 'data/move_2.json'):
+def get_specific_move(move_name: str, move_file_path : str = 'data/moves_2.json'):
     move_list = read_json(move_file_path)
     
     for move in move_list: 
         if move['name'] == move_name: return move
 
-    raise ValueError("{} was not in the pokemon list of the file {}".format(move, move_file_path))
+    raise ValueError("{} was not in the pokemon list of the file {}".format(move_name, move_file_path))
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Random creation of pokemon team and moves
@@ -65,7 +65,7 @@ def create_random_pokemon_team(pokemon_file_path : str, moves_file_path : str, n
         moves = get_random_pokemon(moves_file_path)
         
         # Create the pokemon and add to the team\
-        pokemon_team.append(pokemon.Pokemon(pokemon_info, moves))
+        pokemon_team.append(Pokemon.Pokemon(pokemon_info, moves))
 
     return pokemon_team
 
@@ -75,19 +75,15 @@ def get_started_pokemon(n_starter : int):
     if n_starter != 1 and n_starter != 2 and n_starter != 3:
         raise ValueError("n_starter must have value 1, 2 or 3")
     else:
-        # Get moves and pokemon info from the files
-        pokemon_list = read_json('data/pokemon_2.json')
-        moves_list = read_json('data/moves_2.json')
-
         if n_starter == 1: # Bulbasaur
             starter_info = get_specific_pokemon('bulbasaur')
-            moves = [get_specific_move('tackle',"razor leaf")]
-        elif n_starter == 2:
-            starter_info = get_specific_pokemon('charmender')
-            moves = [get_specific_move('tackle',"ember")]
-        elif n_starter == 3:
+            moves = [get_specific_move('tackle'), get_specific_move("razor leaf")]
+        elif n_starter == 2: # Charmender
+            starter_info = get_specific_pokemon('charmander')
+            moves = [get_specific_move('tackle'), get_specific_move("ember")]
+        elif n_starter == 3: #Squirtle
             starter_info = get_specific_pokemon('squirtle')
-            moves = [get_specific_move('tackle',"water gun")]
+            moves = [get_specific_move('tackle'), get_specific_move("water gun")]
 
-        return pokemon.Pokemon(starter_info, moves)
+        return Pokemon.Pokemon(starter_info, moves)
 
