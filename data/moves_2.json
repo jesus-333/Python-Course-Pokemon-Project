@@ -162,6 +162,5 @@
 {"name": "waterfall", "type": "water", "category": "physical", "power": 80, "accuracy": 1.0, "pp": 15},
 {"name": "whirlwind", "type": "normal", "category": "status", "power": null, "accuracy": 0.85, "pp": 20},
 {"name": "wing attack", "type": "flying", "category": "physical", "power": 35, "accuracy": 1.0, "pp": 35},
-{"name": "withdraw", "type": "water", "category": "status", "power": null, "accuracy": null, "pp": 40, "effect": {"stat": "defense", "stages": 1}},
-{}
+{"name": "withdraw", "type": "water", "category": "status", "power": null, "accuracy": null, "pp": 40, "effect": {"stat": "defense", "stages": 1}}
 ]
