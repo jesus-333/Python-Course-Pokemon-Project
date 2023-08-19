@@ -1,7 +1,7 @@
 import json
 import random
 
-import Pokemon
+from . import Pokemon
 
 """
 %load_ext autoreload
