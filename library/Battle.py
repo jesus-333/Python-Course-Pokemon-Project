@@ -13,6 +13,8 @@ class Battle():
         self.current_pokemon_1 = self.trainer_1.pokemon_list[0]
         self.current_pokemon_2 = self.trainer_2.pokemon_list[0]
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
     def battle(self)-> int :
         continue_battle = True
         exit_status = 0
@@ -27,7 +29,7 @@ class Battle():
             if selected_action.isnumeric():
 
                 if int(selected_action) == 1: # Attack
-                    pass
+                    selecte_move_idx_1 = self.attack(1)
                 elif int(selected_action) == 2: # Change pokemon
                     pass
                 elif int(selected_action) == 3: # Use item
@@ -42,11 +44,38 @@ class Battle():
                         print("You can't run away")
                 else:
                     print("Action not valid")
+            else:
+                print("Action not valid")
 
-                input("Press Enter to continue...")
+            input("Press Enter to continue...")
             
         print("The battle is over.")
         return exit_status
+
+    def attack(self, n_pokemon : int):
+        menu_string = self.__get_moves_menu(n_pokemon)
+        continute_selection = True
+        pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
+
+        while continute_selection:
+            if not self.keep_history: support.clear()
+            selected_move = input(menu_string)
+
+            if selected_move.isnumeric():
+                selected_move = int(selected_move)
+
+                # To obtain a valid index remove 1
+                selected_move -= 1
+
+                # Check the input
+                # if -1 it means exit otherwise is the index of the move
+                if selected_move >= -1 and selected_move < len(pokemon.moves): 
+                    continute_selection = False
+                else:
+                    print("Action not valid")
+
+        return selected_move
+
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Main battle menu
@@ -63,9 +92,9 @@ class Battle():
     def __get_info_string(self) -> str:
         info_string = ""
 
-        info_string += self.__get_pokemon_info_string(0)
-        info_string += "\n"
         info_string += self.__get_pokemon_info_string(1)
+        info_string += "\n"
+        info_string += self.__get_pokemon_info_string(2)
 
         return info_string
 
@@ -92,6 +121,9 @@ class Battle():
         moves_string = "The possible moves are:\n"
         for i in range(len(pokemon.moves)):
             move = pokemon.moves[i]
-            moves_string += ""
+            moves_string += "\t{}) {}/{} - {} - {}\n".format(i + 1, move.pp, move.max_pp, move.name, move.type)
 
+        moves_string += "\n\t0) Return to main menu\n"
+        
+        return moves_string
 

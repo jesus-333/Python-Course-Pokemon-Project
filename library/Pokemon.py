@@ -95,8 +95,8 @@ class Move():
         self.name = moves_info['name']
         self.type = moves_info['type']
         self.category = moves_info['category']
-        self.power = moves_info['power']
+        self.power = moves_info['power'] if moves_info['power'] is not None else 0
         self.accuracy = moves_info['accuracy']
-        self.pp = moves_info['pp']
+        self.pp = int(moves_info['pp'])
         self.max_pp = self.pp
         self.effect = moves_info['effect'] if 'effect' in moves_info else None
