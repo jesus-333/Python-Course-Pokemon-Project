@@ -1,3 +1,5 @@
+import numpy as np
+
 class Pokemon():
 
     def __init__(self, pokemon_info : dict, moves : list):

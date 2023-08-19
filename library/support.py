@@ -88,7 +88,7 @@ def get_started_pokemon(n_starter : int):
 
         return Pokemon.Pokemon(starter_info, moves)
 
-def get_preset_moves(pokemon_name : str):
+def get_preset_moves(pokemon_name : str, return_only_names = False):
     """
     Given a pokemon name return some move(s) already defined
     """
@@ -101,10 +101,13 @@ def get_preset_moves(pokemon_name : str):
         rattata = ['tackle']
     )
     
-    moves = []
-    for move in preset_pokemon_moves[pokemon_name]: moves.append(get_specific_move(move))
+    if return_only_names:
+        return preset_pokemon_moves[pokemon_name]
+    else:
+        moves = []
+        for move in preset_pokemon_moves[pokemon_name]: moves.append(get_specific_move(move))
 
-    return moves
+        return moves
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 

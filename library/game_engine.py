@@ -43,21 +43,25 @@ class Game():
             pokemon_info = raw_data[list(raw_data.keys())[0]]
             return pokemon_info
 
-    def get_moves_info(self, move_name : str):
+    def get_move_info(self, move_name : str):
         tmp_idx = self.df_moves['name'] == move_name
         # Same as for the pokemon name
         if tmp_idx.sum() != 1:
             print("Move name not valid")
             return None
         else:
-            return self.df_moves.loc[tmp_idx].to_dict()
+            raw_data = self.df_moves.loc[tmp_idx].to_dict(orient = 'index')
+            moves_info = raw_data[list(raw_data.keys())[0]]
+
+            return moves_info
 
     def get_predefined_pokemon(self, pokemon_name : str):
         # Get pokemon info from the pandas dataframe
         pokemon_info = self.get_pokemon_info(pokemon_name)
         
         # Get the predefined move for the pokemon
-        moves = support.get_preset_moves(pokemon_name)
+        moves_name = support.get_preset_moves(pokemon_name, True)
+        moves = [self.get_move_info(move) for move in moves_name]
 
         return Pokemon.Pokemon(pokemon_info, moves)
 
