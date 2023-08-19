@@ -1,5 +1,4 @@
-import support
-import Trainer
+from library import Trainer, support
 
 def main():
     trainer_name = input("What is your name?\n")
