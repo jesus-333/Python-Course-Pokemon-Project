@@ -37,6 +37,14 @@ class Battle():
                     else:
                         selected_move_idx_2 = self.selected_move(2)
 
+                    outcome = self.execute_moves(selected_move_idx_1, selected_move_idx_2)
+
+                    if outcome == 1 : # Out pokemon win
+                        continue_battle = False
+                        exit_status = 1
+                    elif outcome == 2: # Opponent has won
+                        exit_status = -1
+
                 elif int(selected_action) == 2: # Change pokemon
                     pass
                 elif int(selected_action) == 3: # Use item
@@ -111,11 +119,13 @@ class Battle():
             damage =  second_pokemon.use_move(second_idx, first_pokemon)
             self.__print_move_outcome(damage, second_pokemon, first_pokemon, second_idx)
             if damage < 0 : damage = 0
-            second_pokemon.base_stats['hp'] -= damage
+            first_pokemon.base_stats['hp'] -= damage
 
             if first_pokemon.base_stats['hp'] <= 0: # Slower pokemon win
+                first_pokemon.base_stats['hp'] = 0
                 return 1 if second_pokemon.name == self.current_pokemon_1 else 2
         else: # Faster pokemon win
+            second_pokemon.base_stats['hp'] = 0
             return 1 if first_pokemon.name == self.current_pokemon_1 else 2
         
         # Nobody win
