@@ -68,13 +68,13 @@ class Pokemon():
     def get_string_description(self, add_moves_info = False):
         tmp_str = ""
         
-        tmp_str += 'Pokemon Info:\n'
+        # tmp_str += 'Pokemon Info:\n'
         for info in self.info['pokemon_info']: 
             if info == 'baseStats':
                 tmp_str += "\tStats:\n"
                 for stats in self.info['pokemon_info']['baseStats']: tmp_str += "\t\t{} : {}\n".format(stats, self.info['pokemon_info']['baseStats'][stats])
             else:
-                tmp_str += "\t{} : {}\n".format(info, self.info['pokemon_info'][info])
+                tmp_str += "{} : {}\n".format(info, self.info['pokemon_info'][info])
         
         if add_moves_info:
             tmp_str += "\n - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
