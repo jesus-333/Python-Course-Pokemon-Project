@@ -1,4 +1,6 @@
 import numpy as np
+import pprint
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 class Pokemon():
@@ -7,14 +9,21 @@ class Pokemon():
         self.national_pokedex_number = pokemon_info['national_pokedex_number']
         self.name = pokemon_info['name']
         self.types = pokemon_info['types']
-        self.base_stats = pokemon_info['base_stats']
+        self.base_stats = pokemon_info['baseStats']
         
-        self.check_moves(moves)
-        self.moves = moves
+        # self.check_moves(moves)
+        # self.moves = moves
+        self.moves = [Move(move_info) for move_info in moves]
 
         self.level = 1
 
         self.status = None
+        
+        # Used for print
+        self.info = dict(
+            pokemon_info = pokemon_info,
+            moves_info = moves
+        )
 
     def check_moves(self, moves : list):
         if len(moves) == len(set(moves)):
@@ -57,16 +66,34 @@ class Pokemon():
             damage = -2
 
         return selected_move, damage
-        
 
+    def __str__(self):
+        tmp_str = ""
+        
+        tmp_str += 'Pokemon Info:\n'
+        for info in self.info['pokemon_info']: 
+            if info == 'baseStats':
+                tmp_str += "\tStats:\n"
+                for stats in self.info['pokemon_info']['baseStats']: tmp_str += "\t\t{} : {}\n".format(stats, self.info['pokemon_info']['baseStats'][stats])
+            else:
+                tmp_str += "\t{} : {}\n".format(info, self.info['pokemon_info'][info])
+
+        tmp_str += "\n - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
+        tmp_str += "Moves info:\n"
+        for move in self.info['moves_info']:
+            for info in move: 
+                if info != 'effects' and info != 'changes':     
+                    tmp_str += "\t{} : {}\n".format(info, move[info] ) 
+            tmp_str += "\n"
+
+        return tmp_str
 
 class Move():
-    def __init__(self, move_info : dict):
-        self.name = move_info['name']
-        self.type = move_info['type']
-        self.category = move_info['category']
-        self.power = move_info['power']
-        self.accuracy = move_info['accuracy']
-        self.pp = move_info['pp']
-        self.effect = move_info['effect'] if type(move_info['effect']) == dict else None
-
+    def __init__(self, moves_info : dict):
+        self.name = moves_info['name']
+        self.type = moves_info['type']
+        self.category = moves_info['category']
+        self.power = moves_info['power']
+        self.accuracy = moves_info['accuracy']
+        self.pp = moves_info['pp']
+        self.effect = moves_info['effect'] if 'effect' in moves_info else None
