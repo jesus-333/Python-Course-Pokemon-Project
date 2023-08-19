@@ -1,11 +1,11 @@
 import numpy as np
 
-from . import support
+from . import support, Pokemon
 
 class Battle():
-    def __init__(self, trainer_1, trainer_2, use_ai_player_1 = True, keep_history : bool = False):
+    def __init__(self, trainer_1, trainer_2, use_ai_player_2 = True, keep_history : bool = False):
         self.keep_history = keep_history
-        self.use_ai_player_1 = use_ai_player_1
+        self.use_ai_player_2 = use_ai_player_2
 
         self.trainer_1 = trainer_1
         self.trainer_2 = trainer_2
@@ -29,7 +29,14 @@ class Battle():
             if selected_action.isnumeric():
 
                 if int(selected_action) == 1: # Attack
-                    selecte_move_idx_1 = self.attack(1)
+                    selected_move_idx_1 = self.selected_move(1)
+
+                    if self.use_ai_player_2:
+                        # Select a random move for pokemon 2
+                        selected_move_idx_2 = np.random.choice(np.arange(len(self.current_pokemon_2.moves)))
+                    else:
+                        selected_move_idx_2 = self.selected_move(2)
+
                 elif int(selected_action) == 2: # Change pokemon
                     pass
                 elif int(selected_action) == 3: # Use item
@@ -52,7 +59,7 @@ class Battle():
         print("The battle is over.")
         return exit_status
 
-    def attack(self, n_pokemon : int):
+    def selected_move(self, n_pokemon : int):
         menu_string = self.__get_moves_menu(n_pokemon)
         continute_selection = True
         pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
@@ -75,6 +82,45 @@ class Battle():
                     print("Action not valid")
 
         return selected_move
+
+    def execute_moves(self, idx_moves_1 : int, idx_moves_2 : int):
+        if self.current_pokemon_1.base_stats['speed'] > self.current_pokemon_2.base_stats['speed']: # Pokemon 1 is faster
+            first_pokemon, second_pokemon = self.current_pokemon_1, self.current_pokemon_2
+            first_idx, second_idx = idx_moves_1, idx_moves_2
+        elif self.current_pokemon_1.base_stats['speed'] < self.current_pokemon_2.base_stats['speed']: # Pokemon 2 is faster
+            first_pokemon, second_pokemon = self.current_pokemon_2, self.current_pokemon_1
+            first_idx, second_idx = idx_moves_2, idx_moves_1
+        else: # Both pokemon have the same speed
+            # Select randomly the first
+            tmp_list = [(self.current_pokemon_1, idx_moves_1), (self.current_pokemon_2, idx_moves_2)]
+            np.random.shuffle(tmp_list)
+            first_pokemon, first_idx = tmp_list[0]
+            second_pokemon, second_idx = tmp_list[1]
+        
+        # Compute the damage of the faster pokemon and print the outcome
+        damage =  first_pokemon.use_move(first_idx, second_pokemon)
+        self.__print_move_outcome(damage, first_pokemon, second_pokemon, first_idx)
+
+        # If the move failed or finish PP the damage is lower than 0 so it is set to 0 for computation
+        if damage < 0 : damage = 0
+        # Remove damage to hp
+        second_pokemon.base_stats['hp'] -= damage
+
+        if second_pokemon.base_stats['hp'] > 0: # The slower pokemon is still alive
+            # Same as for the faster pokemon
+            damage =  second_pokemon.use_move(second_idx, first_pokemon)
+            self.__print_move_outcome(damage, second_pokemon, first_pokemon, second_idx)
+            if damage < 0 : damage = 0
+            second_pokemon.base_stats['hp'] -= damage
+
+            if first_pokemon.base_stats['hp'] <= 0: # Slower pokemon win
+                return 1 if second_pokemon.name == self.current_pokemon_1 else 2
+        else: # Faster pokemon win
+            return 1 if first_pokemon.name == self.current_pokemon_1 else 2
+        
+        # Nobody win
+        return 0
+
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -113,7 +159,7 @@ class Battle():
         return info_string
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    # Submenu
+    # Submenu and other stuff
 
     def __get_moves_menu(self, n_pokemon) -> str:
         pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
@@ -126,4 +172,13 @@ class Battle():
         moves_string += "\n\t0) Return to main menu\n"
         
         return moves_string
+
+    def __print_move_outcome(self, damage, attacker : "Pokemon", defender : "Pokemon", idx_move : int):
+        if damage == -1: 
+            print("{} miss {} with {}".format(attacker.name, defender.name, attacker.moves[idx_move]))
+        elif damage == -2:
+            print("{} finished the PP".format(attacker.moves[idx_move]))
+        else:
+            print("{} use {}".format(attacker.name, attacker.moves[idx_move].name))
+            print("{} receive {} damage to hp".format(defender.name, damage))
 

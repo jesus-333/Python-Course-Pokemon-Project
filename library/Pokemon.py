@@ -63,7 +63,7 @@ class Pokemon():
         else: # Not enough pp
             damage = -2
 
-        return selected_move.name, damage
+        return damage
 
     def get_string_description(self, add_moves_info = False):
         tmp_str = ""
