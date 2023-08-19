@@ -38,7 +38,7 @@ class Pokemon():
         if selected_move.pp > 0:
 
             # Check if the move hit the target
-            if np.random.rand() <= self.accuracy: # Move hit the target
+            if np.random.rand() <= selected_move.accuracy: # Move hit the target
                 # Compute modifier
                 stability = 1.5 if selected_move.type in self.types else 1
                 effect = 1
@@ -65,7 +65,7 @@ class Pokemon():
         else: # Not enough pp
             damage = -2
 
-        return selected_move, damage
+        return selected_move.name, damage
 
     def __str__(self):
         tmp_str = ""
