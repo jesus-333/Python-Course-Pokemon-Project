@@ -1,19 +1,28 @@
 import pandas as pd
+import numpy as np
 
 from . import Pokemon, Trainer, support
 
 class Game():
 
-    def __init__(self, pokemon_file_path : str, moves_file_path : str, keep_history : bool = False):
+    def __init__(self, pokemon_file_path : str, moves_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False):
+        # Save parameters
+        if encounter_prob <= 0 or encounter_prob > 1: 
+            raise ValueError("encounter_prob must be bigger than 0 and less or equal to 1")
+        else: 
+            self.encounter_prob = encounter_prob
+        self.keep_history = keep_history
+        
+        # Dataframe with all the data of the json files
         self.df_pokemon = pd.read_json(pokemon_file_path)
         self.df_moves = pd.read_json(moves_file_path)
-
+    
+        # Create the trainer
         self.create_trainer()
 
-        self.keep_history = keep_history
 
     def create_trainer(self):
-        if not self.keep_history: support.clear()
+        support.clear()
         trainer_name = input("What is your name?\n")
         
         selected_pokemon = -1
@@ -53,14 +62,40 @@ class Game():
 
                 input("Press Enter to continue...")
 
+        print("Thanks for playing. The pokemon you search is in another region")
+
     def explore(self): 
-        print("You travel around the world")
+        print("\nYou travel around the world")
+        
+        if np.random.rand() <= self.encounter_prob:
+            print("You find a wild pokemon")
+
+            wild_pokemon = self.get_wild_pokemon()
+            print("The wild pokemon is a wild {}".format(wild_pokemon.name))
+        else:
+            print("You find nothing trainer")
+
+    def get_wild_pokemon(self):
+        wild_pokemon_list = ["caterpie", "pidgey", "rattata"]
+        wild_pokemon = self.get_predefined_pokemon(np.random.choice(wild_pokemon_list))
+
+        return wild_pokemon
 
     def pokemon_center(self): 
-        print("You visit the pokemon center")
+        print("\nYou visit the pokemon center")
+        print("Your pokemon are fully healed")
+
+        for pokemon in self.trainer.pokemon_list:
+            pokemon.base_stats['hp'] = pokemon.base_stats['max_hp']
 
     def pokemon_store(self): 
-        print("You visit the pokemon store")
+        print("\nYou visit the pokemon store")
+        print("You get 10 pokeballs and 10 potions")
+
+        self.trainer.items = dict(
+            potion = 10,
+            pokebal = 10
+        )
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
