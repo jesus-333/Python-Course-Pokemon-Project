@@ -39,17 +39,19 @@ class Battle():
                         exit_status = 4
                         continue
                     else:
-                        print("\n")
+                        print("You can't run away")
                 else:
                     print("Action not valid")
 
                 input("Press Enter to continue...")
             
-        input("The battle is over. Press Enter to continue...")
+        print("The battle is over.")
         return exit_status
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # Main battle menu
 
-    def __get_main_menu_string(self):
+    def __get_main_menu_string(self) -> str:
         menu_string = ""
         menu_string += "1) Attack\n"
         menu_string += "2) Change Pokemon\n"
@@ -58,7 +60,7 @@ class Battle():
 
         return menu_string
 
-    def __get_info_string(self):
+    def __get_info_string(self) -> str:
         info_string = ""
 
         info_string += self.__get_pokemon_info_string(0)
@@ -67,17 +69,29 @@ class Battle():
 
         return info_string
 
-
-    def __get_pokemon_info_string(self, n_pokemon):
+    def __get_pokemon_info_string(self, n_pokemon) -> str:
         pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
         current_hp = pokemon.base_stats['hp']
         max_hp = pokemon.base_stats['max_hp']
 
-        percentage_hp = np.floor((current_hp / max_hp) * 10)
+        percentage_hp = int(np.floor((current_hp / max_hp) * 10))
 
-        info_string = "{} - L.{}".format(pokemon.name, pokemon.level)
+        info_string = "{} - L.{}\n".format(pokemon.name, pokemon.level)
         info_string += "-" * 12 + "\n"
-        info_string += "|" + "#" * percentage_hp + " " * (10 - percentage_hp) + "|\t{}/{}".format(current_hp, max_hp)
+        info_string += "|" + "#" * percentage_hp + " " * (10 - percentage_hp) + "|\t{}/{}\n".format(current_hp, max_hp)
         info_string += "-" * 12 + "\n"
 
         return info_string
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # Submenu
+
+    def __get_moves_menu(self, n_pokemon) -> str:
+        pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
+
+        moves_string = "The possible moves are:\n"
+        for i in range(len(pokemon.moves)):
+            move = pokemon.moves[i]
+            moves_string += ""
+
+

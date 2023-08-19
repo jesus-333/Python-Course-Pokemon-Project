@@ -89,10 +89,14 @@ class Game():
 
     def pokemon_center(self): 
         print("\nYou visit the pokemon center")
-        print("Your pokemon are fully healed")
+        print("Your pokemons are fully healed and their pp recharged")
 
         for pokemon in self.trainer.pokemon_list:
+            # Refill health
             pokemon.base_stats['hp'] = pokemon.base_stats['max_hp']
+            
+            # Refil moves pp
+            for move in pokemon.moves: move.pp = move.max_pp
 
     def pokemon_store(self): 
         print("\nYou visit the pokemon store")

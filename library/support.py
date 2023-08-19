@@ -96,7 +96,7 @@ def get_preset_moves(pokemon_name : str, return_only_names = False):
         bulbasaur = ['tackle', 'razor leaf'],
         charmander = ['tackle', 'ember'],
         squirtle = ['tackle', 'water gun'],
-        carterpie = ['twineedle'],
+        caterpie = ['twineedle'],
         pidgey = ['tackle', 'peck'],
         rattata = ['tackle']
     )

@@ -98,4 +98,5 @@ class Move():
         self.power = moves_info['power']
         self.accuracy = moves_info['accuracy']
         self.pp = moves_info['pp']
+        self.max_pp = self.pp
         self.effect = moves_info['effect'] if 'effect' in moves_info else None
