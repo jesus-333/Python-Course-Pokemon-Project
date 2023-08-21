@@ -27,17 +27,13 @@ class Battle():
             selected_action = input(self.__get_main_menu_string())
 
             if selected_action.isnumeric():
-
+                # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 if int(selected_action) == 1: # Attack
-                    selected_move_idx_1 = self.selected_move(1)
+                    # Move selection for both pokemon
+                    selected_move_idx_1 = self.selected_move_manually(1)
+                    selected_move_idx_2 = self.selected_move(2, self.use_ai_player_2)
 
-                    if self.use_ai_player_2:
-                        # Select a random move for pokemon 2
-                        selected_move_idx_2 = np.random.choice(np.arange(len(self.current_pokemon_2.moves)))
-                    else:
-                        selected_move_idx_2 = self.selected_move(2)
-
-                    outcome = self.execute_moves(selected_move_idx_1, selected_move_idx_2)
+                    outcome = self.execute_both_moves(selected_move_idx_1, selected_move_idx_2)
 
                     if outcome == 1 : # Our pokemon win
                         if self.count_pokemon_alive(2) > 0: # The opponent has pokemon alive
@@ -54,11 +50,25 @@ class Battle():
                     else:
                         continue
 
+                # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 2: # Change pokemon
                     exit_status = self.change_pokemon(1,1)
 
+                    if exit_status == 0: # Pokemon is not changed
+                        continue
+                    else: # Pokemon is changed
+
+                        if self.use_ai_player_2:
+                            # Select a random move for pokemon 2
+                            selected_move_idx_2 = np.random.choice(np.arange(len(self.current_pokemon_2.moves)))
+                        else:
+                            selected_move_idx_2 = self.selected_move_manually(2)
+
+                # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 3: # Use item
                     pass
+
+                # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 4: # Run away
                     if np.random.rand() <= 0.6:
                         print("\nYou ran away")
@@ -80,7 +90,12 @@ class Battle():
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Attack section
 
-    def selected_move(self, n_pokemon : int):
+    def selected_move_manually(self, n_pokemon : int):
+        """
+        Method that allow to select a move for a pokemon of a specific trainer
+        n_pokemon = 1 for trainer 1 (your character) or 2 (the enemy)
+        """
+
         menu_string = self.__get_moves_menu(n_pokemon)
         continue_selection = True
         pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
@@ -104,7 +119,44 @@ class Battle():
 
         return selected_move
 
-    def execute_moves(self, idx_moves_1 : int, idx_moves_2 : int):
+    def selected_move(self, n_pokemon : int, random_selection : bool = False) -> int:
+        """
+        Allow to randomly or manualy select a move for a pokemon.
+        Return the index of the selected move.
+        """
+
+        if random_selection:
+            current_pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
+            selected_move_idx = np.random.choice(np.arange(len(current_pokemon.moves)))
+        else:
+            selected_move_idx = self.selected_move_manually(n_pokemon)
+
+        return selected_move_idx
+
+    def execute_single_move(self, n_attacker : int, n_defender : int, idx_move : int, random_mode = False):
+        """
+        Methods when only a pokemon attack. Return 1 if the attacker defeat the defender. Otherwise return 0
+        """
+        attacker = self.current_pokemon_1 if n_attacker == 1 else self.current_pokemon_2
+        defender = self.current_pokemon_1 if n_defender == 1 else self.current_pokemon_2
+
+        damage = attacker.use_move(idx_move, defender)
+        if not random_mode: self.__print_move_outcome(damage, attacker, defender, idx_move)
+
+        if damage < 0 : damage = 0
+        defender.base_stats['hp'] -= damage
+
+        if defender.base_stats['hp'] <= 0:
+            defender.base_stats['hp'] = 0
+            return 1
+        else:
+            return 0
+
+    def execute_both_moves(self, idx_moves_1 : int, idx_moves_2 : int):
+        """
+        Methods if both pokemon attack in the same turn.
+        Return 1 if one of the two pokemon is KO. Otherwise it return 0
+        """
         if self.current_pokemon_1.base_stats['speed'] > self.current_pokemon_2.base_stats['speed']: # Pokemon 1 is faster
             first_pokemon, second_pokemon = self.current_pokemon_1, self.current_pokemon_2
             first_idx, second_idx = idx_moves_1, idx_moves_2
@@ -147,22 +199,33 @@ class Battle():
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
     # Change pokemon section
 
-    def change_pokemon(self, n_trainer : int, enter_status : int): 
+    def change_pokemon(self, n_trainer : int, enter_status : int = 1, random_mode : bool = False) -> int:
+        """
+        Method to change the current pokemon specified by n_trainer (1 for trainer_1 and 2 for trainer_2)
+        Return 1 if the pokemon is changed 0 otherwise
+        """
+        if random_mode: # Random selection
+            while True:
+                if n_trainer == 1: 
+                    self.current_pokemon_1 = np.random.choice(self.trainer_1.pokemon_list)
+                    if self.current_pokemon_1.base_stats['hp'] > 0: return 1
+                elif n_trainer == 2:
+                    self.current_pokemon_2 = np.random.choice(self.trainer_2.pokemon_list)
+                    if self.current_pokemon_2.base_stats['hp'] > 0: return 1
+                else:
+                    raise ValueError("n_trainer not valid")
+        else: # Manually selection
+            return self.change_pokemon_manually(n_trainer, enter_status)
+
+
+    def change_pokemon_manually(self, n_trainer : int, enter_status : int) -> int: 
         """
         Change the pokemon.
         n_trainer = trainer who has to change the pokemon
         enter_status = specify if the pokemon must be changed due to exhaustion (-1) or by choice (1)
+
+        Return 1 if the pokemon is changed otherwise return 0
         """
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        # Randomly select another pokemon for player 2
-
-        if n_trainer == 2 and self.use_ai_player_2:
-            while True:
-                self.current_pokemon_2 = np.random.choice(self.trainer_2.pokemon_list)
-                if self.current_pokemon_2.base_stats['hp'] > 0: return
-
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        # Manual selection
 
         trainer = self.trainer_1 if n_trainer == 1 else self.trainer_2
 

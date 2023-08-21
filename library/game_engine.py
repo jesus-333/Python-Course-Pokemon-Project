@@ -154,7 +154,7 @@ class Game():
         menu_string += "\t3) Pokemon Store\n"
         menu_string += "\t4) Trainer info\n"
 
-        menu_string += "\n\t0) Pokemon Store\n"
+        menu_string += "\n\t0) Close game\n"
 
         return menu_string
 
