@@ -33,9 +33,15 @@ class Battle():
                     selected_move_idx_1 = self.select_move_manually(1)
                     selected_move_idx_2 = self.select_move(2, self.use_ai_player_2)
                     
+                    # Skip the battle if no move was selected
+                    if selected_move_idx_1 == -1 : continue
+
                     # Execute the move and evaluate the outcome
                     outcome = self.execute_both_moves(selected_move_idx_1, selected_move_idx_2)
                     exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+                    
+                    # Return the number of the pokemon that win
+                    exit_status = exit_status_battle
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 2: # Change pokemon
@@ -49,6 +55,9 @@ class Battle():
                         selected_move_idx_2 = self.select_move(2, random_mode = self.use_ai_player_2)
                         outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
                         exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+                        
+                        # In the case the pokemon go ko after the change
+                        exit_status = exit_status_battle
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 3: # Use item
@@ -67,13 +76,23 @@ class Battle():
                             print("The {} escape from the pokeball".format(self.current_pokemon_2.name))
                         elif catch_outcome == 1: # Pokemon captured
                             if len(self.trainer_1.pokemon_list) < 6: # You have less than 6 pokemon
+                                print("You captured a wild {}".format(self.current_pokemon_2.name))
                                 self.trainer_1.pokemon_list.append(self.current_pokemon_2)
                             else:
                                 print("You reach the max number of pokemon in the team")
                                 print("You free the captured pokemon that run away")
 
                             continue_battle = False
-
+                        
+                    # This if is valid only if you use a potion or if the opponent escape from the pokeball
+                    if continue_battle and exit_status_item != 0:
+                        # Your opponent attack you after you used the item
+                        selected_move_idx_2 = self.select_move(2, random_mode = self.use_ai_player_2)
+                        outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
+                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+                        
+                        # In the case the pokemon go ko after the item is used
+                        exit_status = exit_status_battle
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 4: # Run away
@@ -320,7 +339,10 @@ class Battle():
             item_selection = input(self.__get_item_menu(1))
 
             if item_selection.isnumeric():
-                if int(item_selection) == 1:
+                if int(item_selection) == 0: # No object
+                    continue_selection = False
+                    exit_status = 0
+                elif int(item_selection) == 1: # Potion
                     if self.trainer_1.potion > 0:
                         self.trainer_1.potion -= 1
                         self.current_pokemon_1.base_stats['hp'] += 20
@@ -334,8 +356,9 @@ class Battle():
                     else:
                         print("You finish the potion")
 
-                elif int(item_selection) == 2:
+                elif int(item_selection) == 2: # Pokeball
                     if self.trainer_1.pokeball > 0:
+                        self.trainer_1.pokeball -= 1
                         continue_selection = False
                         exit_status = 2
                     else:
@@ -369,7 +392,7 @@ class Battle():
         menu_string += "1) Attack\n"
         menu_string += "2) Change Pokemon\n"
         menu_string += "3) Use item\n"
-        menu_string += "4) Run away\n"
+        menu_string += "4) Run away\n\n"
 
         return menu_string
 
@@ -407,7 +430,7 @@ class Battle():
             move = pokemon.moves[i]
             moves_string += "\t{}) {}/{} - {} - {}\n".format(i + 1, move.pp, move.max_pp, move.name, move.type)
 
-        moves_string += "\n\t0) Return to main menu\n"
+        moves_string += "\n\t0) Return to main menu\n\n"
         
         return moves_string
 
@@ -418,7 +441,7 @@ class Battle():
 
         item_string += "\t1) Potion   : {}/10\n".format(trainer.potion)
         item_string += "\t2) Pokeball : {}/10\n\n".format(trainer.pokeball)
-        item_string += "\t0) Exit"
+        item_string += "\t0) Exit\n\n"
 
         return item_string
 

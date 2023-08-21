@@ -36,8 +36,8 @@ class Game():
         if selected_pokemon == 2: starter = self.get_predefined_pokemon('charmander')
         if selected_pokemon == 3: starter = self.get_predefined_pokemon('squirtle')
         
-        # self.trainer = Trainer.Trainer(trainer_name, [starter])
-        self.trainer = Trainer.Trainer(trainer_name, [self.get_predefined_pokemon('charmander'), self.get_predefined_pokemon('bulbasaur'), self.get_predefined_pokemon('squirtle')])
+        self.trainer = Trainer.Trainer(trainer_name, [starter])
+        # self.trainer = Trainer.Trainer(trainer_name, [self.get_predefined_pokemon('charmander'), self.get_predefined_pokemon('bulbasaur'), self.get_predefined_pokemon('squirtle')])
         if not self.keep_history: support.clear()
         print(self.trainer)
 
@@ -78,7 +78,7 @@ class Game():
             print("The wild pokemon is a wild {}".format(wild_pokemon.name))
             
             battle = Battle(self.trainer, wild_trainer)
-            battle.battle()
+            battle_outcome = battle.battle()
         else:
             print("You find nothing trainer")
 
@@ -103,11 +103,8 @@ class Game():
         print("\nYou visit the pokemon store")
         print("You get 10 pokeballs and 10 potions")
 
-        self.trainer.items = dict(
-            potion = 10,
-            pokebal = 10
-        )
-
+        self.trainer.potion = 10
+        self.trainer.pokeball = 10
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Methods to get information inside the json file (converted in pandas dataframe)
