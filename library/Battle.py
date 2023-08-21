@@ -32,37 +32,23 @@ class Battle():
                     # Move selection for both pokemon
                     selected_move_idx_1 = self.selected_move_manually(1)
                     selected_move_idx_2 = self.selected_move(2, self.use_ai_player_2)
-
+                    
+                    # Execute the move and evaluate the outcome
                     outcome = self.execute_both_moves(selected_move_idx_1, selected_move_idx_2)
-
-                    if outcome == 1 : # Our pokemon win
-                        if self.count_pokemon_alive(2) > 0: # The opponent has pokemon alive
-                            self.change_pokemon(2, -1)
-                        else:
-                            continue_battle = False
-                            exit_status = 1
-                    elif outcome == 2: # Opponent has won
-                        if self.count_pokemon_alive(1) > 0: # You have  pokemon alive
-                            self.change_pokemon(1, -1)
-                        else:
-                            continue_battle = False
-                            exit_status = -1
-                    else:
-                        continue
+                    exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 2: # Change pokemon
-                    exit_status = self.change_pokemon(1,1)
+                    exit_status_change = self.change_pokemon(1, 1, random_mode = False)
 
-                    if exit_status == 0: # Pokemon is not changed
+                    if exit_status_change == 0: # Pokemon is not changed
                         continue
                     else: # Pokemon is changed
 
-                        if self.use_ai_player_2:
-                            # Select a random move for pokemon 2
-                            selected_move_idx_2 = np.random.choice(np.arange(len(self.current_pokemon_2.moves)))
-                        else:
-                            selected_move_idx_2 = self.selected_move_manually(2)
+                        # Your opponent attack you after the change
+                        selected_move_idx_2 = self.selected_move(2, random_mode = self.use_ai_player_2)
+                        outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
+                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 3: # Use item
@@ -77,6 +63,12 @@ class Battle():
                         continue
                     else:
                         print("You can't run away")
+
+                        # Your opponent attack you after you fail to escape
+                        selected_move_idx_2 = self.selected_move(2, random_mode = self.use_ai_player_2)
+                        outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
+                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+
                 else:
                     print("Action not valid")
             else:
@@ -133,7 +125,7 @@ class Battle():
 
         return selected_move_idx
 
-    def execute_single_move(self, n_attacker : int, n_defender : int, idx_move : int, random_mode = False):
+    def execute_single_move(self, n_attacker : int, n_defender : int, idx_move : int, print_info = False):
         """
         Methods when only a pokemon attack. Return 1 if the attacker defeat the defender. Otherwise return 0
         """
@@ -141,7 +133,7 @@ class Battle():
         defender = self.current_pokemon_1 if n_defender == 1 else self.current_pokemon_2
 
         damage = attacker.use_move(idx_move, defender)
-        if not random_mode: self.__print_move_outcome(damage, attacker, defender, idx_move)
+        if not print_info: self.__print_move_outcome(damage, attacker, defender, idx_move)
 
         if damage < 0 : damage = 0
         defender.base_stats['hp'] -= damage
@@ -195,6 +187,31 @@ class Battle():
         
         # Nobody win
         return 0
+
+    def eveluate_battle_outcome(self, outcome : int, random_mode = False) -> [int, bool]:
+        """
+        Evaluate the outcome of a battle.
+        Return:
+            -) exit_status, an integer that determin the outcome of the battle (1 -> trainer_1 wins, 2 -> trainer_2 wins, 0 no one wins)
+            -) continue_battle, a bool to indicate if the battle is ended
+        """
+        continue_battle = True
+        exit_status = 0
+
+        if outcome == 1 : # Our pokemon win
+            if self.count_pokemon_alive(2) > 0: # The opponent has pokemon alive
+                self.change_pokemon(2, -1, random_mode = random_mode)
+            else: # No pokemon alive for the opponent
+                continue_battle = False
+                exit_status = 1
+        elif outcome == 2: # Opponent has won
+            if self.count_pokemon_alive(1) > 0: # You have  pokemon alive
+                self.change_pokemon(1, -1, random_mode = self.use_ai_player_2)
+            else: # No pokemon alive for the protagonist
+                continue_battle = False
+                exit_status = 2
+
+        return exit_status, continue_battle
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
     # Change pokemon section
