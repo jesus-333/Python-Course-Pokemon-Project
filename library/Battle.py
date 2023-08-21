@@ -59,7 +59,21 @@ class Battle():
                     elif exit_status_item == 1: # Potion used
                         print("You used a potion")
                     elif exit_status_item == 2: # Use a pokeball
-                        pass
+                        print("You launch a pokeball...")
+
+                        catch_outcome = self.catch_pokemon()
+
+                        if catch_outcome == 0: # Pokemon escaped
+                            print("The {} escape from the pokeball".format(self.current_pokemon_2.name))
+                        elif catch_outcome == 1: # Pokemon captured
+                            if len(self.trainer_1.pokemon_list) < 6: # You have less than 6 pokemon
+                                self.trainer_1.pokemon_list.append(self.current_pokemon_2)
+                            else:
+                                print("You reach the max number of pokemon in the team")
+                                print("You free the captured pokemon that run away")
+
+                            continue_battle = False
+
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 4: # Run away
@@ -334,8 +348,17 @@ class Battle():
         return exit_status
 
     def catch_pokemon(self) -> int:
+        """
+        Method used to catch the opponent pokemon.
+        Return 1 if the pokemon is captured or 0 otherwise
+        """
+        
         catch_probability = 1 - (self.current_pokemon_2.base_stats['hp'] / self.current_pokemon_2.base_stats['max_hp'])
-
+        
+        if np.random.rand() <= catch_probability:
+            return 1
+        else: 
+            return 0
         
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
