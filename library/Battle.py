@@ -250,7 +250,7 @@ class Battle():
 
         while continue_selection:
             if not self.keep_history: support.clear()
-            select_pokemon = input(self.__get_chagen_pokemon_string(n_trainer))
+            select_pokemon = input(self.__get_change_pokemon_string(n_trainer))
 
             if select_pokemon.isnumeric():
                 if int(select_pokemon) == 0: # Return to previous menu
@@ -333,6 +333,16 @@ class Battle():
         
         return moves_string
 
+    def __get_item_menu(self, n_trainer : int) -> str:
+        trainer = self.trainer_1 if n_trainer == 1 else self.trainer_2
+        
+        item_string = "Your items are:\n"
+
+        item_string += "\t1) Potion   : {}/10\n".format(trainer.potion)
+        item_string += "\t2) Pokeball : {}/10\n".format(trainer.pokeball)
+
+        return item_string
+
     def __print_move_outcome(self, damage, attacker : "Pokemon", defender : "Pokemon", idx_move : int):
         if damage == -1: 
             print("{} miss {} with {}".format(attacker.name, defender.name, attacker.moves[idx_move]))
@@ -342,7 +352,7 @@ class Battle():
             print("{} use {}".format(attacker.name, attacker.moves[idx_move].name))
             print("{} receive {} damage to hp".format(defender.name, damage))
 
-    def __get_chagen_pokemon_string(self, n_trainer) -> str:
+    def __get_change_pokemon_string(self, n_trainer) -> str:
         trainer = self.trainer_1 if n_trainer == 1 else self.trainer_2
         
         string_team = "Select the pokemon you want:\n"

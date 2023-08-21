@@ -4,10 +4,8 @@ class Trainer():
         self.name = name
         self.pokemon_list = pokemon_list
 
-        self.items = dict(
-            potion = 10,
-            pokebal = 10
-        )
+        self.potion = 10
+        self.pokeball = 10
 
     def __str__(self):
         tmp_str = ""
@@ -21,6 +19,7 @@ class Trainer():
         
         tmp_str += "* * " * 20 + "\n"
         tmp_str += "\nMy item are:\n"
-        for item_name in self.items: tmp_str += "\t{} : {}\n".format(item_name, self.items[item_name])
+        tmp_str += "\tPotion   : {}/10\n".format(self.potion)
+        tmp_str += "\tPokeball : {}/10\n".format(self.pokeball)
 
         return tmp_str
