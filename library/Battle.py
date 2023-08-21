@@ -52,7 +52,14 @@ class Battle():
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 3: # Use item
-                    pass
+                    exit_status_item = self.use_item()
+
+                    if exit_status_item == 0: # No item used
+                        continue
+                    elif exit_status_item == 1: # Potion used
+                        print("You used a potion")
+                    elif exit_status_item == 2: # Use a pokeball
+                        pass
 
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 4: # Run away
@@ -279,7 +286,57 @@ class Battle():
 
         return exit_status
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+    # Use item section
 
+    def use_item(self) -> int:
+        """
+        Method to use a item. Valid only for trainer 1 (the protagonist)
+        Return an int called exit_status:
+            0 = No object used
+            1 = Potion used
+            2 = Pokeball used
+        """
+        continue_selection = True
+        exit_status = -1
+
+        while continue_selection:
+            if not self.keep_history: support.clear()
+
+            item_selection = input(self.__get_item_menu(1))
+
+            if item_selection.isnumeric():
+                if int(item_selection) == 1:
+                    if self.trainer_1.potion > 0:
+                        self.trainer_1.potion -= 1
+                        self.current_pokemon_1.base_stats['hp'] += 20
+                        
+                        # Reset the hp to the maximum
+                        if self.current_pokemon_1.base_stats['hp'] > self.current_pokemon_1.base_stats['max_hp']:
+                            self.current_pokemon_1.base_stats['hp'] = self.current_pokemon_1.base_stats['max_hp']
+
+                        continue_selection = False
+                        exit_status = 1
+                    else:
+                        print("You finish the potion")
+
+                elif int(item_selection) == 2:
+                    if self.trainer_1.pokeball > 0:
+                        continue_selection = False
+                        exit_status = 2
+                    else:
+                        print("You finish the pokeball")
+                else:
+                    print("Selection not valid")
+            else:
+                print("Selection not valid")
+
+        return exit_status
+
+    def catch_pokemon(self) -> int:
+        catch_probability = 1 - (self.current_pokemon_2.base_stats['hp'] / self.current_pokemon_2.base_stats['max_hp'])
+
+        
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Main battle menu
@@ -337,7 +394,8 @@ class Battle():
         item_string = "Your items are:\n"
 
         item_string += "\t1) Potion   : {}/10\n".format(trainer.potion)
-        item_string += "\t2) Pokeball : {}/10\n".format(trainer.pokeball)
+        item_string += "\t2) Pokeball : {}/10\n\n".format(trainer.pokeball)
+        item_string += "\t0) Exit"
 
         return item_string
 
