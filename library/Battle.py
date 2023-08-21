@@ -39,14 +39,24 @@ class Battle():
 
                     outcome = self.execute_moves(selected_move_idx_1, selected_move_idx_2)
 
-                    if outcome == 1 : # Out pokemon win
-                        continue_battle = False
-                        exit_status = 1
+                    if outcome == 1 : # Our pokemon win
+                        if self.count_pokemon_alive(2) > 0: # The opponent has pokemon alive
+                            self.change_pokemon(2, -1)
+                        else:
+                            continue_battle = False
+                            exit_status = 1
                     elif outcome == 2: # Opponent has won
-                        exit_status = -1
+                        if self.count_pokemon_alive(1) > 0: # You have  pokemon alive
+                            self.change_pokemon(1, -1)
+                        else:
+                            continue_battle = False
+                            exit_status = -1
+                    else:
+                        continue
 
                 elif int(selected_action) == 2: # Change pokemon
-                    pass
+                    exit_status = self.change_pokemon(1,1)
+
                 elif int(selected_action) == 3: # Use item
                     pass
                 elif int(selected_action) == 4: # Run away
@@ -67,12 +77,15 @@ class Battle():
         print("The battle is over.")
         return exit_status
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # Attack section
+
     def selected_move(self, n_pokemon : int):
         menu_string = self.__get_moves_menu(n_pokemon)
-        continute_selection = True
+        continue_selection = True
         pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
 
-        while continute_selection:
+        while continue_selection:
             if not self.keep_history: support.clear()
             selected_move = input(menu_string)
 
@@ -85,7 +98,7 @@ class Battle():
                 # Check the input
                 # if -1 it means exit otherwise is the index of the move
                 if selected_move >= -1 and selected_move < len(pokemon.moves): 
-                    continute_selection = False
+                    continue_selection = False
                 else:
                     print("Action not valid")
 
@@ -130,6 +143,63 @@ class Battle():
         
         # Nobody win
         return 0
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+    # Change pokemon section
+
+    def change_pokemon(self, n_trainer : int, enter_status : int): 
+        """
+        Change the pokemon.
+        n_trainer = trainer who has to change the pokemon
+        enter_status = specify if the pokemon must be changed due to exhaustion (-1) or by choice (1)
+        """
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        # Randomly select another pokemon for player 2
+
+        if n_trainer == 2 and self.use_ai_player_2:
+            while True:
+                self.current_pokemon_2 = np.random.choice(self.trainer_2.pokemon_list)
+                if self.current_pokemon_2.base_stats['hp'] > 0: return
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        # Manual selection
+
+        trainer = self.trainer_1 if n_trainer == 1 else self.trainer_2
+
+        continue_selection = True
+
+        while continue_selection:
+            if not self.keep_history: support.clear()
+            select_pokemon = input(self.__get_chagen_pokemon_string(n_trainer))
+
+            if select_pokemon.isnumeric():
+                if int(select_pokemon) == 0: # Return to previous menu
+                    if enter_status == -1: print("You have to select a new pokemon before return to battle")
+                    else: 
+                        exit_status = 0
+                        continue_selection = False
+                elif int(select_pokemon) < 0 or int(select_pokemon) > len(trainer.pokemon_list): # The index is not valid
+                    print("Selection not valid")
+                else: # Pass a valid index
+                    # Note that in the menu the pokemon are numbered from 1
+                    new_pokemon = trainer.pokemon_list[int(select_pokemon) - 1]
+
+                    if new_pokemon.base_stats['hp'] <= 0: 
+                        print("{} has no hp. Select another pokemon".format(new_pokemon.name))
+                    else:
+                        if n_trainer == 1:
+                            self.current_pokemon_1 = new_pokemon
+                        elif n_trainer == 2:
+                            self.current_pokemon_2 = new_pokemon
+                        else:
+                            raise ValueError("Wrong n_trainer")
+                         
+                        exit_status = 1
+                        continue_selection = False
+
+            input("Press Enter to continue...")
+
+        return exit_status
 
 
 
@@ -192,3 +262,26 @@ class Battle():
             print("{} use {}".format(attacker.name, attacker.moves[idx_move].name))
             print("{} receive {} damage to hp".format(defender.name, damage))
 
+    def __get_chagen_pokemon_string(self, n_trainer) -> str:
+        trainer = self.trainer_1 if n_trainer == 1 else self.trainer_2
+        
+        string_team = "Select the pokemon you want:\n"
+
+        for i in range(len(trainer.pokemon_list)):
+            pokemon = trainer.pokemon_list[i]
+            string_team += "\t{}) {}/{} - {}\n".format(i + 1, pokemon.base_stats['hp'], pokemon.base_stats['max_hp'], pokemon.name)
+        
+        string_team += "\n\t0) Return to fight\n\n"
+
+        return string_team
+
+    def count_pokemon_alive(self, n_trainer : int) -> int:
+        trainer = self.trainer_1 if n_trainer == 1 else self.trainer_2
+        count_alive = 0
+
+        for pokemon in trainer.pokemon_list:
+            if pokemon.base_stats['hp'] >= 0:
+                count_alive += 1
+
+        return count_alive
+    

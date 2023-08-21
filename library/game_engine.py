@@ -36,7 +36,8 @@ class Game():
         if selected_pokemon == 2: starter = self.get_predefined_pokemon('charmander')
         if selected_pokemon == 3: starter = self.get_predefined_pokemon('squirtle')
         
-        self.trainer = Trainer.Trainer(trainer_name, [starter])
+        # self.trainer = Trainer.Trainer(trainer_name, [starter])
+        self.trainer = Trainer.Trainer(trainer_name, [self.get_predefined_pokemon('charmander'), self.get_predefined_pokemon('bulbasaur'), self.get_predefined_pokemon('squirtle')])
         if not self.keep_history: support.clear()
         print(self.trainer)
 
