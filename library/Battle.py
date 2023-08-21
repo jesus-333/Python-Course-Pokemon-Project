@@ -30,8 +30,8 @@ class Battle():
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 if int(selected_action) == 1: # Attack
                     # Move selection for both pokemon
-                    selected_move_idx_1 = self.selected_move_manually(1)
-                    selected_move_idx_2 = self.selected_move(2, self.use_ai_player_2)
+                    selected_move_idx_1 = self.select_move_manually(1)
+                    selected_move_idx_2 = self.select_move(2, self.use_ai_player_2)
                     
                     # Execute the move and evaluate the outcome
                     outcome = self.execute_both_moves(selected_move_idx_1, selected_move_idx_2)
@@ -46,7 +46,7 @@ class Battle():
                     else: # Pokemon is changed
 
                         # Your opponent attack you after the change
-                        selected_move_idx_2 = self.selected_move(2, random_mode = self.use_ai_player_2)
+                        selected_move_idx_2 = self.select_move(2, random_mode = self.use_ai_player_2)
                         outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
                         exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
 
@@ -65,7 +65,7 @@ class Battle():
                         print("You can't run away")
 
                         # Your opponent attack you after you fail to escape
-                        selected_move_idx_2 = self.selected_move(2, random_mode = self.use_ai_player_2)
+                        selected_move_idx_2 = self.select_move(2, random_mode = self.use_ai_player_2)
                         outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
                         exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
 
@@ -82,7 +82,7 @@ class Battle():
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Attack section
 
-    def selected_move_manually(self, n_pokemon : int):
+    def select_move_manually(self, n_pokemon : int):
         """
         Method that allow to select a move for a pokemon of a specific trainer
         n_pokemon = 1 for trainer 1 (your character) or 2 (the enemy)
@@ -111,17 +111,17 @@ class Battle():
 
         return selected_move
 
-    def selected_move(self, n_pokemon : int, random_selection : bool = False) -> int:
+    def select_move(self, n_pokemon : int, random_mode : bool = False) -> int:
         """
         Allow to randomly or manualy select a move for a pokemon.
         Return the index of the selected move.
         """
 
-        if random_selection:
+        if random_mode:
             current_pokemon = self.current_pokemon_1 if n_pokemon == 1 else self.current_pokemon_2
             selected_move_idx = np.random.choice(np.arange(len(current_pokemon.moves)))
         else:
-            selected_move_idx = self.selected_move_manually(n_pokemon)
+            selected_move_idx = self.select_move_manually(n_pokemon)
 
         return selected_move_idx
 
@@ -133,7 +133,7 @@ class Battle():
         defender = self.current_pokemon_1 if n_defender == 1 else self.current_pokemon_2
 
         damage = attacker.use_move(idx_move, defender)
-        if not print_info: self.__print_move_outcome(damage, attacker, defender, idx_move)
+        if print_info: self.__print_move_outcome(damage, attacker, defender, idx_move)
 
         if damage < 0 : damage = 0
         defender.base_stats['hp'] -= damage
@@ -276,8 +276,6 @@ class Battle():
                          
                         exit_status = 1
                         continue_selection = False
-
-            input("Press Enter to continue...")
 
         return exit_status
 
