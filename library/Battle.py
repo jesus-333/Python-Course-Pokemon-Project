@@ -43,6 +43,7 @@ class Battle():
                     # Return the number of the pokemon that win
                     exit_status = exit_status_battle
 
+
                 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 elif int(selected_action) == 2: # Change pokemon
                     exit_status_change = self.change_pokemon(1, 1, random_mode = False)
@@ -187,20 +188,22 @@ class Battle():
     def execute_both_moves(self, idx_moves_1 : int, idx_moves_2 : int):
         """
         Methods if both pokemon attack in the same turn.
-        Return 1 if one of the two pokemon is KO. Otherwise it return 0
+        Return 1 if trainer_1 wins, 2 if trainer_2 wins, 0 otherwise 
         """
         if self.current_pokemon_1.base_stats['speed'] > self.current_pokemon_2.base_stats['speed']: # Pokemon 1 is faster
             first_pokemon, second_pokemon = self.current_pokemon_1, self.current_pokemon_2
             first_idx, second_idx = idx_moves_1, idx_moves_2
+            first_identifier, second_identifier = 1, 2 # Used to return the winner
         elif self.current_pokemon_1.base_stats['speed'] < self.current_pokemon_2.base_stats['speed']: # Pokemon 2 is faster
             first_pokemon, second_pokemon = self.current_pokemon_2, self.current_pokemon_1
             first_idx, second_idx = idx_moves_2, idx_moves_1
+            first_identifier, second_identifier = 2, 1 # Used to return the winner
         else: # Both pokemon have the same speed
             # Select randomly the first
-            tmp_list = [(self.current_pokemon_1, idx_moves_1), (self.current_pokemon_2, idx_moves_2)]
+            tmp_list = [(self.current_pokemon_1, idx_moves_1, 1), (self.current_pokemon_2, idx_moves_2, 2)]
             np.random.shuffle(tmp_list)
-            first_pokemon, first_idx = tmp_list[0]
-            second_pokemon, second_idx = tmp_list[1]
+            first_pokemon, first_idx, first_id = tmp_list[0]
+            second_pokemon, second_idx, second_identifier = tmp_list[1]
         
         # Compute the damage of the faster pokemon and print the outcome
         damage =  first_pokemon.use_move(first_idx, second_pokemon)
@@ -220,10 +223,10 @@ class Battle():
 
             if first_pokemon.base_stats['hp'] <= 0: # Slower pokemon win
                 first_pokemon.base_stats['hp'] = 0
-                return 1 if second_pokemon.name == self.current_pokemon_1 else 2
+                return second_identifier
         else: # Faster pokemon win
             second_pokemon.base_stats['hp'] = 0
-            return 1 if first_pokemon.name == self.current_pokemon_1 else 2
+            return first_identifier
         
         # Nobody win
         return 0
@@ -472,7 +475,7 @@ class Battle():
         count_alive = 0
 
         for pokemon in trainer.pokemon_list:
-            if pokemon.base_stats['hp'] >= 0:
+            if pokemon.base_stats['hp'] > 0:
                 count_alive += 1
 
         return count_alive
