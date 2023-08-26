@@ -84,6 +84,12 @@ class Game():
             
             battle = Battle(self.trainer, wild_trainer)
             battle_outcome = battle.battle()
+
+            if battle_outcome == 1:
+                print("You win the battle")
+            else:
+                print("You lose the battle. You run to pokemon center to cure your pokemon")
+                self.pokemon_center()
         else:
             print("You find nothing trainer")
 
