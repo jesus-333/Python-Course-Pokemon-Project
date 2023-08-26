@@ -27,7 +27,7 @@ class random_game_engin(game_engine):
         """
 
         # Note that with this operation I obtain a dict of the following form {index : {dict with pokemon info}}
-        raw_data = self.df_pokemon.loc[tmp_idx].to_dict(orient = 'index')
+        raw_data = self.df_pokemon.sample().to_dict(orient = 'index')
         # Operation to obtain the inside dictionary with the pokeon info
         pokemon_info = raw_data[list(raw_data.keys())[0]]
 
