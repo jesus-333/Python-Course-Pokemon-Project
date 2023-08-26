@@ -21,6 +21,10 @@ class Game():
     
         # Create the trainer
         self.create_trainer()
+        
+        # Show if print the various menu/information.
+        # Used only for the random mode
+        self.print_var = False
 
 
     def create_trainer(self):
@@ -90,8 +94,9 @@ class Game():
         return wild_pokemon
 
     def pokemon_center(self): 
-        print("\nYou visit the pokemon center")
-        print("Your pokemons are fully healed and their pp recharged")
+        if self.print_var:
+            print("\nYou visit the pokemon center")
+            print("Your pokemons are fully healed and their pp recharged")
 
         for pokemon in self.trainer.pokemon_list:
             # Refill health
@@ -117,7 +122,9 @@ class Game():
             print("Pokemon name not valid")
             return None
         else:
+            # Note that with this operation I obtain a dict of the following form {index : {dict with pokemon info}}
             raw_data = self.df_pokemon.loc[tmp_idx].to_dict(orient = 'index')
+            # Operation to obtain the inside dictionary with the pokeon info
             pokemon_info = raw_data[list(raw_data.keys())[0]]
             return pokemon_info
 
