@@ -2,13 +2,15 @@ from . import game_engine, Battle, Pokemon
 
 class random_game_engin(game_engine):
 
-    def __init__(self, n_battles : int, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False):
+    def __init__(self, n_battles : int, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str):
         """
         Modified game engine to run the simulation
         """
-        super().__init__(pokemon_file_path, moves_file_path, effectivness_file_path, encounter_prob, keep_history)
+        super().__init__(pokemon_file_path, moves_file_path, effectivness_file_path, 1, False)
 
         self.battle_to_simulate = n_battles
+        
+        self.clean_moves()
 
     def clean_moves(self,):
         """
@@ -17,6 +19,7 @@ class random_game_engin(game_engine):
         self.df_moves = self.df_moves[self.df_moves['power'].notna()]
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # Spawn pokemon methods
 
     def get_wild_pokemon(self,):
         """
@@ -35,8 +38,15 @@ class random_game_engin(game_engine):
         
     
     def get_valid_moves(self, pokemon_types : list):
+        """
+        Create a list of all the moves corresponding to pokemon types + normal time and sample 2 moves randomly
+        """
+        pokemon_types.append('normal')
         list_valid_moves = self.df_moves[self.df_moves['type'].isin(pokemon_types)]
         return list_valid_moves.sample(2)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -45,3 +55,12 @@ class RandomBattle(Battle):
     def __init__(self):
         super().__init__()
 
+    def compute_effectivness(self, attacker : "Pokemon", defender : "Pokemon") -> float :
+        effect = 1
+        for attacker_type in attacker.types:
+            for defender_type in defender.types:
+                attacker_filter = (self.df_effectivness['attack'] == attacker_type)
+                defender_filter = (self.df_effectivness['defend'] == defender_type)
+                effect *= self.df_effectivness[attacker_filter & defender_filter]
+
+        return effect
