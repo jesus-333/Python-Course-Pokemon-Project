@@ -6,7 +6,7 @@ from .Battle import Battle
 
 class Game():
 
-    def __init__(self, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False):
+    def __init__(self, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False, selected_starter : int = -1):
         # Save parameters
         if encounter_prob <= 0 or encounter_prob > 1: 
             raise ValueError("encounter_prob must be bigger than 0 and less or equal to 1")
@@ -21,7 +21,8 @@ class Game():
         self.df_effectivness = pd.read_json(effectivness_file_path)
     
         # Create the trainer
-        self.create_trainer()
+        if selected_starter == -1: # Create only in normale mode. selected_starter is different from -1 only in random mode
+            self.create_trainer()
         
         # Show if print the various menu/information.
         # Used only for the random mode
@@ -30,6 +31,7 @@ class Game():
 
     def create_trainer(self):
         support.clear()
+
         trainer_name = input("What is your name?\n")
         
         selected_pokemon = -1
@@ -43,11 +45,11 @@ class Game():
         if selected_pokemon == 3: starter = self.get_predefined_pokemon('squirtle')
         
         self.trainer = Trainer.Trainer(trainer_name, [starter])
-        # self.trainer = Trainer.Trainer(trainer_name, [self.get_predefined_pokemon('charmander'), self.get_predefined_pokemon('bulbasaur'), self.get_predefined_pokemon('squirtle')])
         if not self.keep_history: support.clear()
-        print(self.trainer)
 
-        input("Print Enter to continue...")
+        if self.print_var:
+            print(self.trainer)
+            input("Print Enter to continue...")
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 

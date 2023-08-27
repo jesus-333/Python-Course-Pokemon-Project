@@ -1,20 +1,31 @@
 import random
 import numpy as np
 
-from . import game_engine, Battle, Pokemon
+from . import game_engine, Battle, Pokemon, Trainer
 
-class random_game_engin(game_engine):
+class Game(game_engine):
 
-    def __init__(self, n_battles : int, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str):
+    def __init__(self, n_battles : int, starter : int, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str):
         """
         Modified game engine to run the simulation
+        n_battles = Number of random battle to simulate
+        starter = int that specify  the starter to use (1 = bulbasaur, 2 = charmender, 3 = squirtle)
         """
-        super().__init__(pokemon_file_path, moves_file_path, effectivness_file_path, 1, False)
+        super().__init__(pokemon_file_path, moves_file_path, effectivness_file_path, 1, False, starter)
 
         self.battle_to_simulate = n_battles
         
         self.clean_moves()
         self.print_var = False
+
+
+    def create_trainer(self, starter : int):
+        int_to_starter = ["pikachu", "bulbasaur", "charmandar", "squirtle"]
+        pokemon_info = self.get_pokemon_info(int_to_starter[starter])
+
+        valid_moves = self.get_valid_moves(pokemon_info['types'])
+        wild_pokemon = Pokemon.Pokemon(pokemon_info, valid_moves)
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     def simulate_battles(self):
         # Variable to save statistics 
@@ -78,18 +89,16 @@ class random_game_engin(game_engine):
         list_valid_moves = self.df_moves[self.df_moves['type'].isin(pokemon_types)]
         return list_valid_moves.sample(2)
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 class RandomBattle(Battle):
 
     def __init__(self, pokemon_1 : "Pokemon", pokemon_2 : "Pokemon"):
-        super().__init__([pokemon_1], [pokemon_2])
 
-        self.pokemon_1 = pokemon_1
-        self.pokemon_2 = pokemon_2
+        self.trainer_1 = Trainer.Trainer("Wild pokemon", [pokemon_1])
+        self.trainer_2 = Trainer.Trainer("Wild pokemon", [pokemon_2])
+
+        super().__init__(self.trainer_1, self.trainer_2)
 
     def execute_battle(self):
         continue_battle = True
@@ -106,12 +115,12 @@ class RandomBattle(Battle):
             outcome = self.execute_both_move(idx_move_1, idx_move_2,)
             exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
 
-            self.recharge_pp(self.pokemon_1)
-            self.recharge_pp(self.pokemon_2)
+            self.recharge_pp(self.trainer_1.pokemon_list[0])
+            self.recharge_pp(self.trainer_2.pokemon_list[0])
 
-            turn += 1
+            turns += 1
 
-        return exit_status_battle, turn
+        return exit_status_battle, turns
 
     def recharge_pp(self, pokemon : "Pokemon"):
         for move in pokemon.moves: move.pp = move.max_pp
