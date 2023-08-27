@@ -29,7 +29,7 @@ class Pokemon():
         else:
             raise ValueError("Duplicate moves")
 
-    def use_move(self, idx_move : int, opponent : "Pokemon"):
+    def use_move(self, idx_move : int, opponent : "Pokemon", effect : float = 1):
         selected_move = self.moves[idx_move]
         
         # Check if there are enough pp
@@ -39,7 +39,6 @@ class Pokemon():
             if np.random.rand() <= selected_move.accuracy: # Move hit the target
                 # Compute modifier
                 stability = 1.5 if selected_move.type in self.types else 1
-                effect = 1
                 critical = 2 if np.random.rand() < self.base_stats['speed'] / 512 else 1
                 luck = np.random.uniform(0.85, 1)
                 modifier = stability * effect * critical * luck

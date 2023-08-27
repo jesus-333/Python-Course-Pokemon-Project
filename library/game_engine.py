@@ -6,7 +6,7 @@ from .Battle import Battle
 
 class Game():
 
-    def __init__(self, pokemon_file_path : str, moves_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False):
+    def __init__(self, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False):
         # Save parameters
         if encounter_prob <= 0 or encounter_prob > 1: 
             raise ValueError("encounter_prob must be bigger than 0 and less or equal to 1")
@@ -17,9 +17,14 @@ class Game():
         # Dataframe with all the data of the json files
         self.df_pokemon = pd.read_json(pokemon_file_path)
         self.df_moves = pd.read_json(moves_file_path)
+        self.df_effectivness = pd.read_json(effectivness_file_path)
     
         # Create the trainer
         self.create_trainer()
+        
+        # Show if print the various menu/information.
+        # Used only for the random mode
+        self.print_var = False
 
 
     def create_trainer(self):
@@ -79,6 +84,12 @@ class Game():
             
             battle = Battle(self.trainer, wild_trainer)
             battle_outcome = battle.battle()
+
+            if battle_outcome == 1:
+                print("You win the battle")
+            else:
+                print("You lose the battle. You run to pokemon center to cure your pokemon")
+                self.pokemon_center()
         else:
             print("You find nothing trainer")
 
@@ -89,8 +100,9 @@ class Game():
         return wild_pokemon
 
     def pokemon_center(self): 
-        print("\nYou visit the pokemon center")
-        print("Your pokemons are fully healed and their pp recharged")
+        if self.print_var:
+            print("\nYou visit the pokemon center")
+            print("Your pokemons are fully healed and their pp recharged")
 
         for pokemon in self.trainer.pokemon_list:
             # Refill health
@@ -116,7 +128,9 @@ class Game():
             print("Pokemon name not valid")
             return None
         else:
+            # Note that with this operation I obtain a dict of the following form {index : {dict with pokemon info}}
             raw_data = self.df_pokemon.loc[tmp_idx].to_dict(orient = 'index')
+            # Operation to obtain the inside dictionary with the pokeon info
             pokemon_info = raw_data[list(raw_data.keys())[0]]
             return pokemon_info
 
