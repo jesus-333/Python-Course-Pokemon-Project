@@ -36,7 +36,6 @@ class Pokemon():
     def use_move(self, idx_move : int, opponent : "Pokemon", effect : float = 1):
         selected_move = self.moves[idx_move]
 
-        print(selected_move)
         
         # Check if there are enough pp
         if selected_move.pp > 0:
@@ -55,7 +54,6 @@ class Pokemon():
 
                 # Compute damage
                 base_damage = ((2 * self.level  + 10 ) / 250) * (attack / defense) * selected_move.power + 2
-                print(base_damage, modifier)
                 damage = np.floor(base_damage * modifier)
 
                 # print("{} hit the {}.".format(selected_move.name, opponent.name))

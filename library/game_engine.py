@@ -6,7 +6,7 @@ from .Battle import Battle
 
 class Game():
 
-    def __init__(self, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False, selected_starter : int = -1):
+    def __init__(self, pokemon_file_path : str, moves_file_path : str, effectiveness_file_path : str, encounter_prob : float = 0.8, keep_history : bool = False, selected_starter : int = -1):
         # Save parameters
         if encounter_prob <= 0 or encounter_prob > 1: 
             raise ValueError("encounter_prob must be bigger than 0 and less or equal to 1")
@@ -18,7 +18,7 @@ class Game():
         # Dataframe with all the data of the json files
         self.df_pokemon = pd.read_json(pokemon_file_path)
         self.df_moves = pd.read_json(moves_file_path)
-        self.df_effectivness = pd.read_json(effectivness_file_path)
+        self.df_effectiveness = pd.read_json(effectiveness_file_path)
     
         # Create the trainer
         if selected_starter == -1: # Create only in normale mode. selected_starter is different from -1 only in random mode

@@ -1,31 +1,32 @@
 import random
 import numpy as np
+import copy
 
 from . import game_engine, Battle, Pokemon, Trainer
 
 class Game(game_engine.Game):
 
-    def __init__(self, n_battles : int, starter : int, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str):
+    def __init__(self, n_battles : int, starter : int, pokemon_file_path : str, moves_file_path : str, effectiveness_file_path : str):
         """
         Modified game engine to run the simulation
         n_battles = Number of random battle to simulate
         starter = int that specify  the starter to use (1 = bulbasaur, 2 = charmender, 3 = squirtle)
         """
-        super().__init__(pokemon_file_path, moves_file_path, effectivness_file_path, 1, False, starter)
+        super().__init__(pokemon_file_path, moves_file_path, effectiveness_file_path, 1, False, starter)
         
         self.clean_moves()
 
         self.battle_to_simulate = n_battles
         self.print_var = False
 
-        self.create_trainer(starter)
+        self.create_starter(starter)
 
 
-    def create_trainer(self, starter : int):
+    def create_starter(self, starter : int):
         int_to_starter = ["pikachu", "bulbasaur", "charmandar", "squirtle"]
         pokemon_info = self.get_pokemon_info(int_to_starter[starter])
 
-        valid_moves = self.get_valid_moves(pokemon_info['types'])
+        valid_moves = self.get_valid_moves(copy.deepcopy(pokemon_info['types']))
         self.starter = Pokemon.Pokemon(pokemon_info, valid_moves)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -40,7 +41,7 @@ class Game(game_engine.Game):
         for i in range(self.battle_to_simulate):
             # Spawn and fight wild pokemon
             wild_pokemon = self.get_wild_pokemon()
-            battle = RandomBattle(self.starter, wild_pokemon, self.df_effectivness)
+            battle = RandomBattle(self.starter, wild_pokemon, self.df_effectiveness)
             battle_outcome, turns = battle.execute_battle()
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -55,7 +56,7 @@ class Game(game_engine.Game):
             elif battle_outcome == 2: outcome_counter['loss'] += 1
 
             turns_per_battle[i] = turns
-            percentage_hp_after_battle[i] = self.trainer.pokemon_list[0].base_stats['hp'] /  self.trainer.pokemon_list[0].base_stats['max_hp']
+            percentage_hp_after_battle[i] = self.starter.base_stats['hp'] /  self.starter.base_stats['max_hp']
 
         return wild_pokemon_encountered, outcome_counter, turns_per_battle, percentage_hp_after_battle
 
@@ -63,7 +64,7 @@ class Game(game_engine.Game):
         """
         Remove the moves with no power, i.e. all the moves that in json file have None has power
         """
-        self.df_moves = self.df_moves[(self.df_moves['power'].notna()) % (self.df_moves['pp'].notna())]
+        self.df_moves = self.df_moves[self.df_moves['power'].notna()]
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Spawn pokemon methods
@@ -97,12 +98,12 @@ class Game(game_engine.Game):
 
 class RandomBattle(Battle.Battle):
 
-    def __init__(self, pokemon_1 : "Pokemon", pokemon_2 : "Pokemon", df_effectivness):
+    def __init__(self, pokemon_1 : "Pokemon", pokemon_2 : "Pokemon", df_effectiveness):
 
         self.trainer_1 = Trainer.Trainer("Wild pokemon", [pokemon_1])
         self.trainer_2 = Trainer.Trainer("Wild pokemon", [pokemon_2])
 
-        super().__init__(self.trainer_1, self.trainer_2, df_effectivness = df_effectivness)
+        super().__init__(self.trainer_1, self.trainer_2, df_effectiveness = df_effectiveness)
 
     def execute_battle(self):
         continue_battle = True
@@ -116,7 +117,7 @@ class RandomBattle(Battle.Battle):
             moves_2 = self.trainer_2.pokemon_list[0].moves
             idx_move_2 = random.randint(0, len(moves_2) - 1)
             
-            outcome = self.execute_both_moves(idx_move_1, idx_move_2,)
+            outcome = self.execute_both_moves(idx_move_1, idx_move_2, print_var = False)
             exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
 
             self.recharge_pp(self.trainer_1.pokemon_list[0])
