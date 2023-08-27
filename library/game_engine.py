@@ -25,7 +25,7 @@ class Game():
         
         # Show if print the various menu/information.
         # Used only for the random mode
-        self.print_var = False
+        self.print_var = True 
 
 
     def create_trainer(self):

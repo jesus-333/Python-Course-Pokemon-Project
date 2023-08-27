@@ -1,3 +1,5 @@
+import random
+
 from . import game_engine, Battle, Pokemon
 
 class random_game_engin(game_engine):
@@ -11,8 +13,14 @@ class random_game_engin(game_engine):
         self.battle_to_simulate = n_battles
         
         self.clean_moves()
+        self.print_var = False
 
-    def clean_moves(self,):
+    def simulate_battles(self):
+        for i in range(self.battle_to_simulate):
+            battle = RandomBattle()
+            battle_outcome = battle.execute_battle()
+
+    def clean_moves(self):
         """
         Remove the moves with no power, i.e. all the moves that in json file have None has power
         """
@@ -52,15 +60,28 @@ class random_game_engin(game_engine):
 
 class RandomBattle(Battle):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, pokemon_1 : "Pokemon", pokemon_2 : "Pokemon"):
+        super().__init__([pokemon_1], [pokemon_2])
 
-    def compute_effectivness(self, attacker : "Pokemon", defender : "Pokemon") -> float :
-        effect = 1
-        for attacker_type in attacker.types:
-            for defender_type in defender.types:
-                attacker_filter = (self.df_effectivness['attack'] == attacker_type)
-                defender_filter = (self.df_effectivness['defend'] == defender_type)
-                effect *= self.df_effectivness[attacker_filter & defender_filter]
+        self.pokemon_1 = pokemon_1
+        self.pokemon_2 = pokemon_2
 
-        return effect
+    def execute_battle(self):
+        continue_battle = True
+        while continue_battle:
+            # Select a random move for pokemon 1
+            moves_1 = self.pokemon_1.moves
+            idx_move_1 = random.randint(0, len(moves_1) - 1)
+            
+            # Select a random move for poekemon 2 
+            moves_2 = self.pokemon_1.moves
+            idx_move_2 = random.randint(0, len(moves_2) - 1)
+            
+            outcome = self.execute_both_move(idx_move_1, idx_move_2,)
+            exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
+
+        return exit_status_battle
+
+
+    def recharge_pp(self):
+        pass

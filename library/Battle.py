@@ -209,7 +209,8 @@ class Battle():
             second_pokemon, second_idx, second_identifier = tmp_list[1]
         
         # Compute the damage of the faster pokemon and print the outcome
-        damage =  first_pokemon.use_move(first_idx, second_pokemon)
+        effect = self.compute_effectivness(first_pokemon, second_pokemon)
+        damage =  first_pokemon.use_move(first_idx, second_pokemon, effect)
         self.__print_move_outcome(damage, first_pokemon, second_pokemon, first_idx)
 
         # If the move failed or finish PP the damage is lower than 0 so it is set to 0 for computation
@@ -219,7 +220,8 @@ class Battle():
 
         if second_pokemon.base_stats['hp'] > 0: # The slower pokemon is still alive
             # Same as for the faster pokemon
-            damage =  second_pokemon.use_move(second_idx, first_pokemon)
+            effect = self.compute_effectivness(second_pokemon, first_pokemon)
+            damage =  second_pokemon.use_move(second_idx, first_pokemon, effect)
             self.__print_move_outcome(damage, second_pokemon, first_pokemon, second_idx)
             if damage < 0 : damage = 0
             first_pokemon.base_stats['hp'] -= damage
@@ -233,6 +235,16 @@ class Battle():
         
         # Nobody win
         return 0
+
+    def compute_effectivness(self, attacker : "Pokemon", defender : "Pokemon") -> float :
+        effect = 1
+        for attacker_type in attacker.types:
+            for defender_type in defender.types:
+                attacker_filter = (self.df_effectivness['attack'] == attacker_type)
+                defender_filter = (self.df_effectivness['defend'] == defender_type)
+                effect *= self.df_effectivness[attacker_filter & defender_filter]
+
+        return effect
 
     def eveluate_battle_outcome(self, outcome : int) -> [int, bool]:
         """
