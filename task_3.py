@@ -1,8 +1,9 @@
 import sys
+import numpy as np
 
 from library import random_engine, plot_task_3
 
-def main(n_game : int = 500, n_battles : int = 150):
+def main(n_games : int = 500, n_battles : int = 150):
     int_to_starter = ["pikachu", "bulbasaur", "charmandar", "squirtle"]
 
     wild_pokemon_encountered = dict()
@@ -16,20 +17,37 @@ def main(n_game : int = 500, n_battles : int = 150):
 
         # Dictionary initialization
         wild_pokemon_encountered[starter] = dict()
-        outcome_counter[starter] = dict()
-        turns_per_battle[starter] = np.zeros(n_game, n_battles)
-        percentage_hp_after_battle[starter] = np.zeros(n_game, n_battles)
+        outcome_counter[starter] = dict(win = 0, loss = 0)
+        turns_per_battle[starter] = np.zeros(n_games, n_battles)
+        percentage_hp_after_battle[starter] = np.zeros(n_games, n_battles)
 
-        for j in range(n_game):
+        for j in range(n_games):
             # Create game and simulate battles
             game = random_engine.Game(n_battles, i, 'data/pokemon_2.json', 'data/moves_2.json', 'data/type_effectiveness_2.json')
             tmp_wild_pokemon_encountered, tmp_outcome_counter, tmp_turns_per_battle, tmp_percentage_hp_after_battle = game.battle_to_simulate(n_battles)
 
+            # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Save statistics
+
+            # Wild pokemon encountered
+            for wild_pokemon in tmp_wild_pokemon_encountered:
+                if wild_pokemon in wild_pokemon_encountered[starter]:
+                    wild_pokemon_encountered[starter][wild_pokemon] += tmp_wild_pokemon_encountered[wild_pokemon]
+                else:
+                    wild_pokemon_encountered[starter][wild_pokemon] = tmp_wild_pokemon_encountered[wild_pokemon]
+
+            # Battle outcome
+            outcome_counter[starter]['win']  += tmp_outcome_counter['win']
+            outcome_counter[starter]['loss'] += tmp_outcome_counter['loss']
+
+            turns_per_battle[starter][j, :] = tmp_turns_per_battle
+            percentage_hp_after_battle[starter][j, :] = tmp_percentage_hp_after_battle
+
+    plot_task_3.plot_n_victories(int_to_starter, outcome_counter, n_games)
 
 
 if __name__ == '__main__':
-    n_game = sys.argv[1]
+    n_games = sys.argv[1]
     n_battles = sys.argv[2]
-    main(n_game. n_battles)
+    main(n_games. n_battles)
 

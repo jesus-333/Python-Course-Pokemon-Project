@@ -12,11 +12,13 @@ class Game(game_engine):
         starter = int that specify  the starter to use (1 = bulbasaur, 2 = charmender, 3 = squirtle)
         """
         super().__init__(pokemon_file_path, moves_file_path, effectivness_file_path, 1, False, starter)
-
-        self.battle_to_simulate = n_battles
         
         self.clean_moves()
+
+        self.battle_to_simulate = n_battles
         self.print_var = False
+
+        self.create_starter(starter)
 
 
     def create_trainer(self, starter : int):
@@ -24,7 +26,8 @@ class Game(game_engine):
         pokemon_info = self.get_pokemon_info(int_to_starter[starter])
 
         valid_moves = self.get_valid_moves(pokemon_info['types'])
-        wild_pokemon = Pokemon.Pokemon(pokemon_info, valid_moves)
+        self.starter = Pokemon.Pokemon(pokemon_info, valid_moves)
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     def simulate_battles(self):
@@ -37,7 +40,7 @@ class Game(game_engine):
         for i in range(self.battle_to_simulate):
             # Spawn and fight wild pokemon
             wild_pokemon = self.get_wild_pokemon()
-            battle = RandomBattle(self.trainer.pokemon_list[0], wild_pokemon)
+            battle = RandomBattle(self.starter, wild_pokemon)
             battle_outcome, turns = battle.execute_battle()
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -79,7 +82,6 @@ class Game(game_engine):
         wild_pokemon = Pokemon.Pokemon(pokemon_info, valid_moves)
 
         return wild_pokemon
-        
     
     def get_valid_moves(self, pokemon_types : list):
         """
