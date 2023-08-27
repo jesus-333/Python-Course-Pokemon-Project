@@ -23,7 +23,7 @@ class Game(game_engine.Game):
 
 
     def create_starter(self, starter : int):
-        int_to_starter = ["pikachu", "bulbasaur", "charmandar", "squirtle"]
+        int_to_starter = ["pikachu", "bulbasaur", "charmander", "squirtle"]
         pokemon_info = self.get_pokemon_info(int_to_starter[starter])
 
         valid_moves = self.get_valid_moves(copy.deepcopy(pokemon_info['types']))
