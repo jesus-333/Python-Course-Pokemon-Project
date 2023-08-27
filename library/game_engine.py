@@ -98,7 +98,6 @@ class Game():
 
     def get_wild_pokemon(self):
         wild_pokemon_list = ["caterpie", "pidgey", "rattata"]
-        wild_pokemon_list = ["caterpie"]
         wild_pokemon = self.get_predefined_pokemon(np.random.choice(wild_pokemon_list))
         print(wild_pokemon)
 

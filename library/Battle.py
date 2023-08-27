@@ -38,7 +38,7 @@ class Battle():
 
                     # Execute the move and evaluate the outcome
                     outcome = self.execute_both_moves(selected_move_idx_1, selected_move_idx_2)
-                    exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+                    exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
                     
                     # Return the number of the pokemon that win
                     exit_status = exit_status_battle
@@ -55,7 +55,7 @@ class Battle():
                         # Your opponent attack you after the change
                         selected_move_idx_2 = self.select_move(2, random_mode = self.use_ai_player_2)
                         outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
-                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
                         
                         # In the case the pokemon go ko after the change
                         exit_status = exit_status_battle
@@ -91,7 +91,7 @@ class Battle():
                         # Your opponent attack you after you used the item
                         selected_move_idx_2 = self.select_move(2, random_mode = self.use_ai_player_2)
                         outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
-                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
                         
                         # In the case the pokemon go ko after the item is used
                         exit_status = exit_status_battle
@@ -109,7 +109,7 @@ class Battle():
                         # Your opponent attack you after you fail to escape
                         selected_move_idx_2 = self.select_move(2, random_mode = self.use_ai_player_2)
                         outcome = self.execute_single_move(2, 1, selected_move_idx_2, print_info = True)
-                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome, False)
+                        exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
 
                 else:
                     print("Action not valid")
@@ -174,6 +174,8 @@ class Battle():
         attacker = self.current_pokemon_1 if n_attacker == 1 else self.current_pokemon_2
         defender = self.current_pokemon_1 if n_defender == 1 else self.current_pokemon_2
 
+        attacker_id = 1 if n_attacker == 1 else 2
+
         damage = attacker.use_move(idx_move, defender)
         if print_info: self.__print_move_outcome(damage, attacker, defender, idx_move)
 
@@ -182,7 +184,7 @@ class Battle():
 
         if defender.base_stats['hp'] <= 0:
             defender.base_stats['hp'] = 0
-            return 1
+            return attacker_id
         else:
             return 0
 
@@ -232,7 +234,7 @@ class Battle():
         # Nobody win
         return 0
 
-    def eveluate_battle_outcome(self, outcome : int, random_mode = False) -> [int, bool]:
+    def eveluate_battle_outcome(self, outcome : int) -> [int, bool]:
         """
         Evaluate the outcome of a battle.
         Return:
@@ -244,7 +246,7 @@ class Battle():
 
         if outcome == 1 : # Our pokemon win
             if self.count_pokemon_alive(2) > 0: # The opponent has pokemon alive
-                self.change_pokemon(2, -1, random_mode = random_mode)
+                self.change_pokemon(2, -1, random_mode = False)
             else: # No pokemon alive for the opponent
                 continue_battle = False
                 exit_status = 1
@@ -414,12 +416,13 @@ class Battle():
         current_hp = pokemon.base_stats['hp']
         max_hp = pokemon.base_stats['max_hp']
 
-        percentage_hp = int(np.floor((current_hp / max_hp) * 10))
+        bar_length = 20
+        percentage_hp = int(np.floor((current_hp / max_hp) * bar_length))
 
         info_string = "{} - L.{}\n".format(pokemon.name, pokemon.level)
-        info_string += "-" * 12 + "\n"
-        info_string += "|" + "#" * percentage_hp + " " * (10 - percentage_hp) + "|\t{}/{}\n".format(current_hp, max_hp)
-        info_string += "-" * 12 + "\n"
+        info_string += "-" * (bar_length + 2) + "\n"
+        info_string += "|" + "#" * percentage_hp + " " * (bar_length - percentage_hp) + "|\t{}/{}\n".format(current_hp, max_hp)
+        info_string += "-" * (bar_length + 2) + "\n"
 
         return info_string
 
