@@ -133,7 +133,6 @@
 {"name": "stomp", "type": "normal", "category": "physical", "power": 65, "accuracy": 1.0, "pp": 20, "effect": {"chance": 0.3, "statusCondition": "flinch"}},
 {"name": "strength", "type": "normal", "category": "physical", "power": 80, "accuracy": 1.0, "pp": 15},
 {"name": "string shot", "type": "bug", "category": "status", "power": null, "accuracy": 0.95, "pp": 40, "effect": {"stat": "speed", "stages": -1}},
-{"name": "struggle", "type": "normal", "category": "physical", "power": 50, "accuracy": 1.0, "pp": null, "effects": ["Only usable when all PP are gone. Hurts the user."]},
 {"name": "stun spore", "type": "grass", "category": "status", "power": null, "accuracy": 0.75, "pp": 30, "effect": {"statusCondition": "paralysis"}},
 {"name": "submission", "type": "fighting", "category": "physical", "power": 80, "accuracy": 0.8, "pp": 25, "effects": ["Submission deals damage, but the user receives 1⁄4 of the damage it inflicts in recoil. In other words, if the attack does 100 HP damage to the opponent, the user will lose 25 HP."]},
 {"name": "substitute", "type": "normal", "category": "status", "power": null, "accuracy": null, "pp": 10, "effects": ["Uses HP to creates a decoy that takes hits."]},
