@@ -13,6 +13,7 @@ class Game():
         else: 
             self.encounter_prob = encounter_prob
         self.keep_history = keep_history
+        self.keep_history = True
         
         # Dataframe with all the data of the json files
         self.df_pokemon = pd.read_json(pokemon_file_path)
@@ -82,12 +83,14 @@ class Game():
             print("You find a wild pokemon")
             print("The wild pokemon is a wild {}".format(wild_pokemon.name))
             
-            battle = Battle(self.trainer, wild_trainer)
+            battle = Battle(self.trainer, wild_trainer, use_ai_player_2 = True, keep_history = self.keep_history)
             battle_outcome = battle.battle()
 
-            if battle_outcome == 1:
+            if battle_outcome == 1 or battle_outcome == 3:
+                # 1 -> your pokemon win, 3 -> wild pokemon captured
                 print("You win the battle")
             else:
+                # 2 -> wild pokemon win
                 print("You lose the battle. You run to pokemon center to cure your pokemon")
                 self.pokemon_center()
         else:
@@ -95,7 +98,9 @@ class Game():
 
     def get_wild_pokemon(self):
         wild_pokemon_list = ["caterpie", "pidgey", "rattata"]
+        wild_pokemon_list = ["caterpie"]
         wild_pokemon = self.get_predefined_pokemon(np.random.choice(wild_pokemon_list))
+        print(wild_pokemon)
 
         return wild_pokemon
 
@@ -153,8 +158,8 @@ class Game():
         # Get the predefined move for the pokemon
         moves_name = support.get_preset_moves(pokemon_name, True)
         moves = [self.get_move_info(move) for move in moves_name]
-
-        return Pokemon.Pokemon(pokemon_info, moves)
+        
+        return Pokemon.Pokemon(pokemon_info, moves) 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     

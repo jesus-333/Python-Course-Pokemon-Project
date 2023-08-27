@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 class Pokemon():
 
@@ -6,7 +7,7 @@ class Pokemon():
         self.national_pokedex_number = pokemon_info['national_pokedex_number']
         self.name = pokemon_info['name']
         self.types = pokemon_info['types']
-        self.base_stats = pokemon_info['baseStats']
+        self.base_stats = copy.deepcopy(pokemon_info['baseStats'])
         self.base_stats['max_hp'] = self.base_stats['hp']
         
         # self.check_moves(moves)

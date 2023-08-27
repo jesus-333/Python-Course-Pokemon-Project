@@ -84,6 +84,7 @@ class Battle():
                                 print("You free the captured pokemon that run away")
 
                             continue_battle = False
+                            exit_status = 3
                         
                     # This if is valid only if you use a potion or if the opponent escape from the pokeball
                     if continue_battle and exit_status_item != 0:
@@ -202,7 +203,7 @@ class Battle():
             # Select randomly the first
             tmp_list = [(self.current_pokemon_1, idx_moves_1, 1), (self.current_pokemon_2, idx_moves_2, 2)]
             np.random.shuffle(tmp_list)
-            first_pokemon, first_idx, first_id = tmp_list[0]
+            first_pokemon, first_idx, first_identifier = tmp_list[0]
             second_pokemon, second_idx, second_identifier = tmp_list[1]
         
         # Compute the damage of the faster pokemon and print the outcome
