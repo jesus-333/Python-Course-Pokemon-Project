@@ -97,6 +97,7 @@ class Pokemon():
 
 class Move():
     def __init__(self, moves_info : dict):
+        print(moves_info)
         self.name = moves_info['name']
         self.type = moves_info['type']
         self.category = moves_info['category']

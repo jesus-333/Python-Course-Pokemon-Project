@@ -3,7 +3,7 @@ import numpy as np
 
 from . import game_engine, Battle, Pokemon, Trainer
 
-class Game(game_engine):
+class Game(game_engine.Game):
 
     def __init__(self, n_battles : int, starter : int, pokemon_file_path : str, moves_file_path : str, effectivness_file_path : str):
         """
@@ -18,7 +18,7 @@ class Game(game_engine):
         self.battle_to_simulate = n_battles
         self.print_var = False
 
-        self.create_starter(starter)
+        self.create_trainer(starter)
 
 
     def create_trainer(self, starter : int):
@@ -89,11 +89,13 @@ class Game(game_engine):
         """
         pokemon_types.append('normal')
         list_valid_moves = self.df_moves[self.df_moves['type'].isin(pokemon_types)]
-        return list_valid_moves.sample(2)
+        valid_move = list_valid_moves.sample(2).to_dict(orient = 'index')
+
+        return [valid_move[idx] for  idx in valid_move] 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-class RandomBattle(Battle):
+class RandomBattle(Battle.Battle):
 
     def __init__(self, pokemon_1 : "Pokemon", pokemon_2 : "Pokemon"):
 
@@ -107,11 +109,11 @@ class RandomBattle(Battle):
         turns = 0
         while continue_battle:
             # Select a random move for pokemon 1
-            moves_1 = self.pokemon_1.moves
+            moves_1 = self.trainer_1.pokemon_list[0] 
             idx_move_1 = random.randint(0, len(moves_1) - 1)
             
             # Select a random move for poekemon 2 
-            moves_2 = self.pokemon_1.moves
+            moves_2 = self.trainer_2.pokemon_list[0] 
             idx_move_2 = random.randint(0, len(moves_2) - 1)
             
             outcome = self.execute_both_move(idx_move_1, idx_move_2,)

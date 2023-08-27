@@ -18,13 +18,15 @@ def main(n_games : int = 500, n_battles : int = 150):
         # Dictionary initialization
         wild_pokemon_encountered[starter] = dict()
         outcome_counter[starter] = dict(win = 0, loss = 0)
-        turns_per_battle[starter] = np.zeros(n_games, n_battles)
-        percentage_hp_after_battle[starter] = np.zeros(n_games, n_battles)
+        turns_per_battle[starter] = np.zeros((n_games, n_battles))
+        percentage_hp_after_battle[starter] = np.zeros((n_games, n_battles))
 
         for j in range(n_games):
+            print(starter, round((j + 1)/n_games * 100), 2)
+
             # Create game and simulate battles
             game = random_engine.Game(n_battles, i, 'data/pokemon_2.json', 'data/moves_2.json', 'data/type_effectiveness_2.json')
-            tmp_wild_pokemon_encountered, tmp_outcome_counter, tmp_turns_per_battle, tmp_percentage_hp_after_battle = game.battle_to_simulate(n_battles)
+            tmp_wild_pokemon_encountered, tmp_outcome_counter, tmp_turns_per_battle, tmp_percentage_hp_after_battle = game.simulate_battles()
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Save statistics
@@ -47,7 +49,8 @@ def main(n_games : int = 500, n_battles : int = 150):
 
 
 if __name__ == '__main__':
-    n_games = sys.argv[1]
-    n_battles = sys.argv[2]
-    main(n_games. n_battles)
+    n_games = int( sys.argv[1] )
+    n_battles = int( sys.argv[2] )
+
+    main(n_games, n_battles)
 
