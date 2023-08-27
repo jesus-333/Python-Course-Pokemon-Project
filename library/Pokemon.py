@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 class Pokemon():
 
@@ -6,8 +7,10 @@ class Pokemon():
         self.national_pokedex_number = pokemon_info['national_pokedex_number']
         self.name = pokemon_info['name']
         self.types = pokemon_info['types']
-        self.base_stats = pokemon_info['baseStats']
-        self.base_stats['max_hp'] = self.base_stats['hp']
+
+        pokemon_info['baseStats']['max_hp'] = pokemon_info['baseStats']['hp']
+        self.base_stats = copy.deepcopy(pokemon_info['baseStats'])
+        # self.base_stats['max_hp'] = self.base_stats['hp']
         
         # self.check_moves(moves)
         # self.moves = moves
@@ -66,12 +69,15 @@ class Pokemon():
 
     def get_string_description(self, add_moves_info = False):
         tmp_str = ""
+
+        self.info['pokemon_info']['baseStats']['hp'] = self.base_stats['hp']
         
         # tmp_str += 'Pokemon Info:\n'
         for info in self.info['pokemon_info']: 
             if info == 'baseStats':
                 tmp_str += "\tStats:\n"
-                for stats in self.info['pokemon_info']['baseStats']: tmp_str += "\t\t{} : {}\n".format(stats, self.info['pokemon_info']['baseStats'][stats])
+                for stats in self.info['pokemon_info']['baseStats']: 
+                    tmp_str += "\t\t{} : {}\n".format(stats, self.info['pokemon_info']['baseStats'][stats])
             else:
                 tmp_str += "{} : {}\n".format(info, self.info['pokemon_info'][info])
         
