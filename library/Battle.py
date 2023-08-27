@@ -3,7 +3,7 @@ import numpy as np
 from . import support, Pokemon
 
 class Battle():
-    def __init__(self, trainer_1, trainer_2, use_ai_player_2 = True, keep_history : bool = False):
+    def __init__(self, trainer_1, trainer_2, use_ai_player_2 = True, keep_history : bool = False, df_effectivness = None):
         self.keep_history = keep_history
         self.use_ai_player_2 = use_ai_player_2
 
@@ -12,6 +12,8 @@ class Battle():
 
         self.current_pokemon_1 = self.trainer_1.pokemon_list[0]
         self.current_pokemon_2 = self.trainer_2.pokemon_list[0]
+
+        if df_effectivness is not None: self.df_effectivness = df_effectivness
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 

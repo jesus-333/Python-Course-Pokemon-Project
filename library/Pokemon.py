@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import pprint
 
 class Pokemon():
 
@@ -34,6 +35,8 @@ class Pokemon():
 
     def use_move(self, idx_move : int, opponent : "Pokemon", effect : float = 1):
         selected_move = self.moves[idx_move]
+
+        print(selected_move)
         
         # Check if there are enough pp
         if selected_move.pp > 0:
@@ -52,6 +55,7 @@ class Pokemon():
 
                 # Compute damage
                 base_damage = ((2 * self.level  + 10 ) / 250) * (attack / defense) * selected_move.power + 2
+                print(base_damage, modifier)
                 damage = np.floor(base_damage * modifier)
 
                 # print("{} hit the {}.".format(selected_move.name, opponent.name))
@@ -97,7 +101,7 @@ class Pokemon():
 
 class Move():
     def __init__(self, moves_info : dict):
-        print(moves_info)
+        # print(moves_info)
         self.name = moves_info['name']
         self.type = moves_info['type']
         self.category = moves_info['category']
@@ -106,3 +110,11 @@ class Move():
         self.pp = int(moves_info['pp'])
         self.max_pp = self.pp
         self.effect = moves_info['effect'] if 'effect' in moves_info else None
+
+        self.moves_info = moves_info # Saved only for print
+
+    def __str__(self):
+        info_string = ""
+        for info in self.moves_info: info_string += "{} \t: {}".format(info, self.moves_info[info])
+        return info_string
+

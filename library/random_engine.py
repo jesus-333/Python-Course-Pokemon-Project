@@ -40,7 +40,7 @@ class Game(game_engine.Game):
         for i in range(self.battle_to_simulate):
             # Spawn and fight wild pokemon
             wild_pokemon = self.get_wild_pokemon()
-            battle = RandomBattle(self.starter, wild_pokemon)
+            battle = RandomBattle(self.starter, wild_pokemon, self.df_effectivness)
             battle_outcome, turns = battle.execute_battle()
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -63,7 +63,7 @@ class Game(game_engine.Game):
         """
         Remove the moves with no power, i.e. all the moves that in json file have None has power
         """
-        self.df_moves = self.df_moves[self.df_moves['power'].notna()]
+        self.df_moves = self.df_moves[(self.df_moves['power'].notna()) % (self.df_moves['pp'].notna())]
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Spawn pokemon methods
@@ -97,26 +97,26 @@ class Game(game_engine.Game):
 
 class RandomBattle(Battle.Battle):
 
-    def __init__(self, pokemon_1 : "Pokemon", pokemon_2 : "Pokemon"):
+    def __init__(self, pokemon_1 : "Pokemon", pokemon_2 : "Pokemon", df_effectivness):
 
         self.trainer_1 = Trainer.Trainer("Wild pokemon", [pokemon_1])
         self.trainer_2 = Trainer.Trainer("Wild pokemon", [pokemon_2])
 
-        super().__init__(self.trainer_1, self.trainer_2)
+        super().__init__(self.trainer_1, self.trainer_2, df_effectivness = df_effectivness)
 
     def execute_battle(self):
         continue_battle = True
         turns = 0
         while continue_battle:
             # Select a random move for pokemon 1
-            moves_1 = self.trainer_1.pokemon_list[0] 
+            moves_1 = self.trainer_1.pokemon_list[0].moves 
             idx_move_1 = random.randint(0, len(moves_1) - 1)
             
             # Select a random move for poekemon 2 
-            moves_2 = self.trainer_2.pokemon_list[0] 
+            moves_2 = self.trainer_2.pokemon_list[0].moves
             idx_move_2 = random.randint(0, len(moves_2) - 1)
             
-            outcome = self.execute_both_move(idx_move_1, idx_move_2,)
+            outcome = self.execute_both_moves(idx_move_1, idx_move_2,)
             exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
 
             self.recharge_pp(self.trainer_1.pokemon_list[0])
