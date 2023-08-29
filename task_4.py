@@ -34,7 +34,8 @@ if __name__ == '__main__':
         battle_statistics[starter] = dict(
             hp_during_battle = [],
             damage_during_battle = [],
-            moves_during_battle = []
+            moves_during_battle = [],
+            starter_level = [],
         )
 
         for j in range(n_games):
@@ -74,6 +75,7 @@ if __name__ == '__main__':
             # Save battle statistics
             for statistics in tmp_battle_statistics:
                 battle_statistics[starter][statistics].extend(tmp_battle_statistics[statistics])
+            battle_statistics[starter]['starter_level'].append(game.starter.level) 
         
         suffix = "_{}_{}_{}".format(starter, n_games, n_battles)
         save_results(wild_pokemon_encountered[starter], "results/wild_pokemon_encountered" + suffix)

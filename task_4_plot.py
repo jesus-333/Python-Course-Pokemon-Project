@@ -1,6 +1,7 @@
 import sys
 import pickle
 import numpy as np
+import pandas as pd
 
 from library import  plot_task_4
 
@@ -35,3 +36,10 @@ if __name__ == '__main__':
     max_number_of_turns_per_starter = dict()
     for starter in starter_list: max_number_of_turns_per_starter[starter] = int(turns_per_battle[starter].max())
     plot_task_4.plot_health_during_fight(starter_list , battle_statistics , max_number_of_turns_per_starter)
+
+    plot_task_4.plot_pie_moves(starter_list, battle_statistics)
+
+    df_pokemon = pd.read_json('data/pokemon_2.json')
+    plot_task_4.plot_pie_types(starter_list, wild_pokemon_encountered, df_pokemon)
+
+    plot_task_4.plot_bar_chart_damage(starter_list, battle_statistics)
