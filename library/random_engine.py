@@ -48,15 +48,26 @@ class Game(game_engine.Game):
             # Save statistics
             
             if wild_pokemon.name in wild_pokemon_encountered:
-                wild_pokemon_encountered[wild_pokemon.name] += 1
+                wild_pokemon_encountered[wild_pokemon.name]['n_encounter'] += 1
             else:
-                wild_pokemon_encountered[wild_pokemon.name] = 0
+                wild_pokemon_encountered[wild_pokemon.name] = dict(
+                    n_encounter = 1,
+                    win = 0,
+                    loss = 0,
+                    percentage_hp_after_battle = np.zeros(self.battle_to_simulate)
+                )
 
-            if battle_outcome == 1: outcome_counter['win'] += 1
-            elif battle_outcome == 2: outcome_counter['loss'] += 1
+            if battle_outcome == 1: 
+                outcome_counter['win'] += 1
+                wild_pokemon_encountered[wild_pokemon.name]['win'] += 1
+            elif battle_outcome == 2: 
+                outcome_counter['loss'] += 1
+                wild_pokemon_encountered[wild_pokemon.name]['loss'] += 1
 
             turns_per_battle[i] = turns
             percentage_hp_after_battle[i] = self.starter.base_stats['hp'] /  self.starter.base_stats['max_hp']
+
+            wild_pokemon_encountered[wild_pokemon.name]['percentage_hp_after_battle'][i] = percentage_hp_after_battle[i]
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Go to pokemon center to heal
