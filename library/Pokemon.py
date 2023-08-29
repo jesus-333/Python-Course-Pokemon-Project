@@ -4,20 +4,19 @@ import pprint
 
 class Pokemon():
 
-    def __init__(self, pokemon_info : dict, moves : list):
+    def __init__(self, pokemon_info : dict, moves : list, level = 1):
+        pokemon_info['baseStats'] = self.update_stats_based_on_level(pokemon_info['baseStats'], level)
+
         self.national_pokedex_number = pokemon_info['national_pokedex_number']
         self.name = pokemon_info['name']
         self.types = pokemon_info['types']
 
         pokemon_info['baseStats']['max_hp'] = pokemon_info['baseStats']['hp']
         self.base_stats = copy.deepcopy(pokemon_info['baseStats'])
-        # self.base_stats['max_hp'] = self.base_stats['hp']
         
-        # self.check_moves(moves)
-        # self.moves = moves
         self.moves = [Move(move_info) for move_info in moves]
 
-        self.level = 1
+        self.level = level
 
         self.status = None
         
@@ -26,6 +25,16 @@ class Pokemon():
             pokemon_info = pokemon_info,
             moves_info = moves
         )
+
+    def update_stats_based_on_level(self, base_stats : dict, level : int):
+        new_stats = dict()
+        for stats in base_stats:
+            if stats == 'hp':
+                new_stats[stats] = np.floor(base_stats[stats] * 2 * level / 100) + level + 10
+            else:
+                new_stats[stats] = np.floor(base_stats[stats] * 2 * level / 100) + 5
+
+        return new_stats
 
     def check_moves(self, moves : list):
         if len(moves) == len(set(moves)):

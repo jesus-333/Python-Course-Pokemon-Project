@@ -54,7 +54,8 @@ class Game(game_engine.Game):
                     n_encounter = 1,
                     win = 0,
                     loss = 0,
-                    percentage_hp_after_battle = np.zeros(self.battle_to_simulate)
+                    percentage_hp_after_battle = [],
+                    turns = []
                 )
 
             if battle_outcome == 1: 
@@ -67,7 +68,8 @@ class Game(game_engine.Game):
             turns_per_battle[i] = turns
             percentage_hp_after_battle[i] = self.starter.base_stats['hp'] /  self.starter.base_stats['max_hp']
 
-            wild_pokemon_encountered[wild_pokemon.name]['percentage_hp_after_battle'][i] = percentage_hp_after_battle[i]
+            wild_pokemon_encountered[wild_pokemon.name]['percentage_hp_after_battle'].append(percentage_hp_after_battle[i])
+            wild_pokemon_encountered[wild_pokemon.name]['turns'].append(turns)
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Go to pokemon center to heal
