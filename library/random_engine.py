@@ -41,7 +41,9 @@ class Game(game_engine.Game):
         battle_statistics = dict(
             hp_during_battle = [],
             damage_during_battle = [],
-            moves_during_battle = []
+            moves_during_battle = [],
+            enemy_types = [],
+            outcome = [],
         )
 
         for i in range(self.battle_to_simulate):
@@ -80,6 +82,8 @@ class Game(game_engine.Game):
             battle_statistics['hp_during_battle'].append(single_battle_statistics['hp'])
             battle_statistics['damage_during_battle'].append(single_battle_statistics['damage'])
             battle_statistics['moves_during_battle'].append(single_battle_statistics['moves_used'])
+            battle_statistics['enemy_types'].append(wild_pokemon.types)
+            battle_statistics['outcome'].append(1 if battle_outcome == 1 else 0)
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Go to pokemon center to heal
