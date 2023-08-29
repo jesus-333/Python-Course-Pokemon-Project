@@ -1,12 +1,13 @@
 import sys
 import numpy as np
 import pickle
+import copy
 
 from library import random_engine
 
 def main(n_games : int = 500, n_battles : int = 150):
     starter_list = ["pikachu", "bulbasaur", "charmander", "squirtle"]
-    starter_list = ["bulbasaur"]
+    # starter_list = ["squirtle"]
 
     wild_pokemon_encountered = dict()
     outcome_counter = dict()
@@ -35,10 +36,20 @@ def main(n_games : int = 500, n_battles : int = 150):
 
             # Wild pokemon encountered
             for wild_pokemon in tmp_wild_pokemon_encountered:
-                if wild_pokemon in wild_pokemon_encountered[starter]:
-                    wild_pokemon_encountered[starter][wild_pokemon] += tmp_wild_pokemon_encountered[wild_pokemon]
-                else:
-                    wild_pokemon_encountered[starter][wild_pokemon] = tmp_wild_pokemon_encountered[wild_pokemon]
+                if wild_pokemon not in wild_pokemon_encountered[starter]: # Wild pokemon not see in previous simulation
+                    wild_pokemon_encountered[starter][wild_pokemon] = dict(
+                        n_encounter = 1,
+                        win = 0,
+                        loss = 0,
+                        percentage_hp_after_battle = np.zeros((n_games, n_battles))
+                    )
+                
+                print(wild_pokemon)
+                print(tmp_wild_pokemon_encountered[wild_pokemon])
+                wild_pokemon_encountered[starter][wild_pokemon]['n_encounter'] = tmp_wild_pokemon_encountered[wild_pokemon]['n_encounter']
+                wild_pokemon_encountered[starter][wild_pokemon]['win'] = tmp_wild_pokemon_encountered[wild_pokemon]['win']
+                wild_pokemon_encountered[starter][wild_pokemon]['loss'] = tmp_wild_pokemon_encountered[wild_pokemon]['loss']
+                wild_pokemon_encountered[starter][wild_pokemon]['percentage_hp_after_battle'] = tmp_wild_pokemon_encountered[wild_pokemon]['percentage_hp_after_battle']
 
             # Battle outcome
             outcome_counter[starter]['win']  += tmp_outcome_counter['win']

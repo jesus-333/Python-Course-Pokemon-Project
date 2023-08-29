@@ -1,24 +1,34 @@
 import sys
 import pickle
+import numpy as np
 
 from library import  plot_task_3
 
 def main(n_games : int, n_battles : int):
-    int_to_starter = ["pikachu", "bulbasaur", "charmander", "squirtle"]
+    starter_list = ["pikachu", "bulbasaur", "charmander", "squirtle"]
     
-    outcome_counter = load_data(int_to_starter, "outcome_counter", n_games, n_battles)
-    plot_task_3.plot_n_victories(int_to_starter, outcome_counter, n_games)
+    outcome_counter = load_data(starter_list, "outcome_counter", n_games, n_battles)
+    plot_task_3.plot_n_victories(starter_list, outcome_counter, n_games)
 
-    turns_per_battle = load_data(int_to_starter, "turns_per_battle", n_games, n_battles)
-    percentage_hp_after_battle = load_data(int_to_starter, "percentage_hp_after_battle", n_games, n_battles)
-    plot_task_3.box_plot_turns_and_residual_health(int_to_starter, turns_per_battle, percentage_hp_after_battle)
+    turns_per_battle = load_data(starter_list, "turns_per_battle", n_games, n_battles)
+    percentage_hp_after_battle = load_data(starter_list, "percentage_hp_after_battle", n_games, n_battles)
+    plot_task_3.box_plot_turns_and_residual_health(starter_list, turns_per_battle, percentage_hp_after_battle)
 
-    print(turns_per_battle['bulbasaur'])
-    import numpy as np
-    print(np.max(turns_per_battle['bulbasaur']))
-    print(np.min(turns_per_battle['bulbasaur']))
+    for starter in starter_list:
+        print("\n\nStarter", starter)
+        print("\tTurns per battle:")
+        print_statistics(turns_per_battle[starter].flatten())
+        print("\tPercentage HP after battle:")
+        print_statistics(percentage_hp_after_battle[starter].flatten())
 
-    wild_pokemon_encountered = load_data(int_to_starter, "wild_pokemon_encountered", n_games, n_battles) 
+    wild_pokemon_encountered = load_data(starter_list, "wild_pokemon_encountered", n_games, n_battles) 
+    
+    for starter in starter_list:
+        tot = 0
+        for el in wild_pokemon_encountered[starter]: tot += wild_pokemon_encountered[starter][el]
+        print(tot)
+
+    print(wild_pokemon_encountered[starter])
 
 def load_data(starter_list : int, file_name : str, n_games : int, n_battles : int) -> dict:
     outcome_counter = dict()
@@ -29,6 +39,12 @@ def load_data(starter_list : int, file_name : str, n_games : int, n_battles : in
         pickle_in.close()
 
     return outcome_counter
+
+def print_statistics(statistics):
+    print("\t\tMean           = ", np.mean(statistics))
+    print("\t\tMedian         = ", np.median(statistics))
+    print("\t\t25th quartile = ", np.quantile(statistics, 0.25))
+    print("\t\t75th quartile = ", np.quantile(statistics, 0.75))
 
 if __name__ == '__main__':
     n_games = int( sys.argv[1] )
