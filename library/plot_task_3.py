@@ -46,12 +46,12 @@ def bar_charts_percentage_victories(starter_list : list, wild_pokemon_encountere
         for i in range(len(wild_pokemon_list)):
             wild_pokemon = wild_pokemon_list[i]
             if percentage_victories[i] > 0.7: 
-                if wild_pokemon_encountered[starter][wild_pokemon]['percentage_hp_after_battle'].mean() > 0.7:
+                if np.mean(wild_pokemon_encountered[starter][wild_pokemon]['percentage_hp_after_battle']) > 0.7:
                     color.append('green')
                 else:
                     color.append('blue')
             else: 
-                if wild_pokemon_encountered[starter][wild_pokemon]['turns'] >= np.median(turns_list):
+                if np.mean(wild_pokemon_encountered[starter][wild_pokemon]['turns']) >= np.median(turns_list):
                     color.append('red')
                 else:
                     color.append('blue')
