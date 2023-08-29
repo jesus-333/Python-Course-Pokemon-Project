@@ -4,7 +4,15 @@ import pickle
 
 from library import random_engine
 
-def main(n_games : int = 500, n_battles : int = 150):
+def save_results(object_to_save, name):
+    pickle_out = open("{}.pickle".format(name), "wb") 
+    pickle.dump(object_to_save , pickle_out ) 
+    pickle_out.close() 
+
+if __name__ == '__main__':
+    n_games = int( sys.argv[1] )
+    n_battles = int( sys.argv[2] )
+
     starter_list = ["pikachu", "bulbasaur", "charmander", "squirtle"]
     # starter_list = ["squirtle"]
 
@@ -12,6 +20,7 @@ def main(n_games : int = 500, n_battles : int = 150):
     outcome_counter = dict()
     turns_per_battle = dict()
     percentage_hp_after_battle = dict()
+    battle_statistics = dict()
 
     for i in range(len(starter_list)): # i go from 0 to 3 and represent the starter
         # Get the starter name
@@ -22,13 +31,18 @@ def main(n_games : int = 500, n_battles : int = 150):
         outcome_counter[starter] = dict(win = 0, loss = 0)
         turns_per_battle[starter] = np.zeros((n_games, n_battles))
         percentage_hp_after_battle[starter] = np.zeros((n_games, n_battles))
+        battle_statistics[starter] = dict(
+            hp_during_battle = [],
+            damage_during_battle = [],
+            moves_during_battle = []
+        )
 
         for j in range(n_games):
             print(starter, round((j + 1)/n_games * 100, 2))
 
             # Create game and simulate battles
             game = random_engine.Game(n_battles, i, 'data/pokemon_2.json', 'data/moves_2.json', 'data/type_effectiveness_2.json')
-            tmp_wild_pokemon_encountered, tmp_outcome_counter, tmp_turns_per_battle, tmp_percentage_hp_after_battle = game.simulate_battles()
+            tmp_wild_pokemon_encountered, tmp_outcome_counter, tmp_turns_per_battle, tmp_percentage_hp_after_battle, tmp_battle_statistics = game.simulate_battles()
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Save statistics
@@ -56,21 +70,13 @@ def main(n_games : int = 500, n_battles : int = 150):
 
             turns_per_battle[starter][j, :] = tmp_turns_per_battle
             percentage_hp_after_battle[starter][j, :] = tmp_percentage_hp_after_battle
+            
+            # Save battle statistics
+            for statistics in tmp_battle_statistics:
+                battle_statistics[starter][statistics].extend(tmp_battle_statistics[statistics])
         
         suffix = "_{}_{}_{}".format(starter, n_games, n_battles)
         save_results(wild_pokemon_encountered[starter], "results/wild_pokemon_encountered" + suffix)
         save_results(outcome_counter[starter], "results/outcome_counter" + suffix)
         save_results(turns_per_battle[starter], "results/turns_per_battle" + suffix)
         save_results(percentage_hp_after_battle[starter], "results/percentage_hp_after_battle" + suffix)
-
-def save_results(object_to_save, name):
-    pickle_out = open("{}.pickle".format(name), "wb") 
-    pickle.dump(object_to_save , pickle_out ) 
-    pickle_out.close() 
-
-if __name__ == '__main__':
-    n_games = int( sys.argv[1] )
-    n_battles = int( sys.argv[2] )
-
-    main(n_games, n_battles)
-
