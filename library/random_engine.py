@@ -58,6 +58,11 @@ class Game(game_engine.Game):
             turns_per_battle[i] = turns
             percentage_hp_after_battle[i] = self.starter.base_stats['hp'] /  self.starter.base_stats['max_hp']
 
+            # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+            # Go to pokemon center to heal
+            self.pokemon_center()
+
+
         return wild_pokemon_encountered, outcome_counter, turns_per_battle, percentage_hp_after_battle
 
     def clean_moves(self):
@@ -65,6 +70,14 @@ class Game(game_engine.Game):
         Remove the moves with no power, i.e. all the moves that in json file have None has power
         """
         self.df_moves = self.df_moves[self.df_moves['power'].notna()]
+
+
+    def pokemon_center(self):
+        # Refill health
+        self.starter.base_stats['hp'] = self.starter.base_stats['max_hp']
+        
+        # Refil moves pp (not needed but put here just in case)
+        for move in self.starter.moves: move.pp = move.max_pp
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Spawn pokemon methods
@@ -88,8 +101,9 @@ class Game(game_engine.Game):
         """
         Create a list of all the moves corresponding to pokemon types + normal time and sample 2 moves randomly
         """
-        pokemon_types.append('normal')
-        list_valid_moves = self.df_moves[self.df_moves['type'].isin(pokemon_types)]
+        tmp_type_list = ['normal']
+        for pokemon_type in pokemon_types: tmp_type_list.append(pokemon_type)
+        list_valid_moves = self.df_moves[self.df_moves['type'].isin(tmp_type_list)]
         valid_move = list_valid_moves.sample(2).to_dict(orient = 'index')
 
         return [valid_move[idx] for  idx in valid_move] 

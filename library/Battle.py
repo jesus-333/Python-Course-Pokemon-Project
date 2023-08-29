@@ -248,7 +248,9 @@ class Battle():
                 else:
                     attacker_filter = (self.df_effectiveness['attack'] == attacker_type)
                     defender_filter = (self.df_effectiveness['defend'] == defender_type)
-                    effect *= float(self.df_effectiveness[attacker_filter & defender_filter]['effectiveness'])
+                    
+                    effect *= float(self.df_effectiveness[np.logical_and(attacker_filter, defender_filter)]['effectiveness'])
+                    # effect *= float(self.df_effectiveness[attacker_filter & defender_filter]['effectiveness'])
 
         return effect
 
