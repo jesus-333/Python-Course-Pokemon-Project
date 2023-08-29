@@ -25,9 +25,10 @@ class Game(game_engine.Game):
     def create_starter(self, starter : int):
         int_to_starter = ["pikachu", "bulbasaur", "charmander", "squirtle"]
         pokemon_info = self.get_pokemon_info(int_to_starter[starter])
+        level = np.random.randint(1, 21)
 
         valid_moves = self.get_valid_moves(copy.deepcopy(pokemon_info['types']))
-        self.starter = Pokemon.Pokemon(pokemon_info, valid_moves)
+        self.starter = Pokemon.Pokemon(pokemon_info, valid_moves, level)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -114,7 +115,9 @@ class Game(game_engine.Game):
         pokemon_info = raw_data[list(raw_data.keys())[0]]
 
         valid_moves = self.get_valid_moves(pokemon_info['types'])
-        wild_pokemon = Pokemon.Pokemon(pokemon_info, valid_moves)
+        level = np.random.randint(1, 21)
+
+        wild_pokemon = Pokemon.Pokemon(pokemon_info, valid_moves, level)
 
         return wild_pokemon
     
@@ -144,7 +147,7 @@ class RandomBattle(Battle.Battle):
         continue_battle = True
         turns = 0
         battle_statistics = dict(
-            hp = [],
+            hp = [self.trainer_1.pokemon_list[0].base_stats['hp']],
             moves_used = [],
             damage = []
         )
