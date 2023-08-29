@@ -233,7 +233,7 @@ class Battle():
                 return second_identifier, (damage_first, first_identifier), (damage_second, second_identifier)
         else: # Faster pokemon win
             second_pokemon.base_stats['hp'] = 0
-            return first_identifier,(damage_first, first_identifier), (damage_second, second_identifier) 
+            return first_identifier,(damage_first, first_identifier), (0, second_identifier) 
         
         # Nobody win
         return 0, (damage_first, first_identifier), (damage_second, second_identifier)
