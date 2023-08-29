@@ -2,19 +2,20 @@ import sys
 import numpy as np
 import pickle
 
-from library import random_engine, plot_task_3
+from library import random_engine
 
 def main(n_games : int = 500, n_battles : int = 150):
-    int_to_starter = ["pikachu", "bulbasaur", "charmander", "squirtle"]
+    starter_list = ["pikachu", "bulbasaur", "charmander", "squirtle"]
+    starter_list = ["bulbasaur"]
 
     wild_pokemon_encountered = dict()
     outcome_counter = dict()
     turns_per_battle = dict()
     percentage_hp_after_battle = dict()
 
-    for i in range(4): # i go from 0 to 3 and represent the starter
+    for i in range(len(starter_list)): # i go from 0 to 3 and represent the starter
         # Get the starter name
-        starter = int_to_starter[i]
+        starter = starter_list[i]
 
         # Dictionary initialization
         wild_pokemon_encountered[starter] = dict()
