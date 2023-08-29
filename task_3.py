@@ -41,15 +41,15 @@ def main(n_games : int = 500, n_battles : int = 150):
                         n_encounter = 1,
                         win = 0,
                         loss = 0,
-                        percentage_hp_after_battle = np.zeros((n_games, n_battles))
+                        percentage_hp_after_battle = [],
+                        turns = []
                     )
                 
-                print(wild_pokemon)
-                print(tmp_wild_pokemon_encountered[wild_pokemon])
                 wild_pokemon_encountered[starter][wild_pokemon]['n_encounter'] = tmp_wild_pokemon_encountered[wild_pokemon]['n_encounter']
                 wild_pokemon_encountered[starter][wild_pokemon]['win'] = tmp_wild_pokemon_encountered[wild_pokemon]['win']
                 wild_pokemon_encountered[starter][wild_pokemon]['loss'] = tmp_wild_pokemon_encountered[wild_pokemon]['loss']
-                wild_pokemon_encountered[starter][wild_pokemon]['percentage_hp_after_battle'] = tmp_wild_pokemon_encountered[wild_pokemon]['percentage_hp_after_battle']
+                wild_pokemon_encountered[starter][wild_pokemon]['percentage_hp_after_battle'].extend(tmp_wild_pokemon_encountered[wild_pokemon]['percentage_hp_after_battle']) 
+                wild_pokemon_encountered[starter][wild_pokemon]['turns'].extend(tmp_wild_pokemon_encountered[wild_pokemon]['turns']) 
 
             # Battle outcome
             outcome_counter[starter]['win']  += tmp_outcome_counter['win']
