@@ -39,7 +39,7 @@ class Battle():
                     if selected_move_idx_1 == -1 : continue
 
                     # Execute the move and evaluate the outcome
-                    outcome = self.execute_both_moves(selected_move_idx_1, selected_move_idx_2)
+                    outcome, _, _ = self.execute_both_moves(selected_move_idx_1, selected_move_idx_2)
                     exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
                     
                     # Return the number of the pokemon that win
@@ -212,31 +212,31 @@ class Battle():
         
         # Compute the damage of the faster pokemon and print the outcome
         effect = self.compute_effectiveness(first_pokemon, second_pokemon)
-        damage =  first_pokemon.use_move(first_idx, second_pokemon, effect)
-        if print_var: self.__print_move_outcome(damage, first_pokemon, second_pokemon, first_idx)
+        damage_first =  first_pokemon.use_move(first_idx, second_pokemon, effect)
+        if print_var: self.__print_move_outcome(damage_first, first_pokemon, second_pokemon, first_idx)
 
         # If the move failed or finish PP the damage is lower than 0 so it is set to 0 for computation
-        if damage < 0 : damage = 0
+        if damage_first < 0 : damage_first = 0
         # Remove damage to hp
-        second_pokemon.base_stats['hp'] -= damage
+        second_pokemon.base_stats['hp'] -= damage_first
 
         if second_pokemon.base_stats['hp'] > 0: # The slower pokemon is still alive
             # Same as for the faster pokemon
             effect = self.compute_effectiveness(second_pokemon, first_pokemon)
-            damage =  second_pokemon.use_move(second_idx, first_pokemon, effect)
-            if print_var: self.__print_move_outcome(damage, second_pokemon, first_pokemon, second_idx)
-            if damage < 0 : damage = 0
-            first_pokemon.base_stats['hp'] -= damage
+            damage_second =  second_pokemon.use_move(second_idx, first_pokemon, effect)
+            if print_var: self.__print_move_outcome(damage_second, second_pokemon, first_pokemon, second_idx)
+            if damage_second < 0 : damage_second = 0
+            first_pokemon.base_stats['hp'] -= damage_second
 
             if first_pokemon.base_stats['hp'] <= 0: # Slower pokemon win
                 first_pokemon.base_stats['hp'] = 0
-                return second_identifier
+                return second_identifier, (damage_first, first_identifier), (damage_second, second_identifier)
         else: # Faster pokemon win
             second_pokemon.base_stats['hp'] = 0
-            return first_identifier
+            return first_identifier,(damage_first, first_identifier), (0, second_identifier) 
         
         # Nobody win
-        return 0
+        return 0, (damage_first, first_identifier), (damage_second, second_identifier)
 
     def compute_effectiveness(self, attacker : "Pokemon", defender : "Pokemon") -> float :
         effect = 1

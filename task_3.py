@@ -29,7 +29,7 @@ def main(n_games : int = 500, n_battles : int = 150):
 
             # Create game and simulate battles
             game = random_engine.Game(n_battles, i, 'data/pokemon_2.json', 'data/moves_2.json', 'data/type_effectiveness_2.json')
-            tmp_wild_pokemon_encountered, tmp_outcome_counter, tmp_turns_per_battle, tmp_percentage_hp_after_battle = game.simulate_battles()
+            tmp_wild_pokemon_encountered, tmp_outcome_counter, tmp_turns_per_battle, tmp_percentage_hp_after_battle, _ = game.simulate_battles()
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Save statistics
