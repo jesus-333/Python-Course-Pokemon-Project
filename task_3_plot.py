@@ -22,15 +22,8 @@ def main(n_games : int, n_battles : int):
         print_statistics(percentage_hp_after_battle[starter].flatten())
 
     wild_pokemon_encountered = load_data(starter_list, "wild_pokemon_encountered", n_games, n_battles) 
-    print(wild_pokemon_encountered)
 
     plot_task_3.bar_charts_percentage_victories(starter_list, wild_pokemon_encountered)
-    
-    for starter in starter_list:
-        tot = 0
-        for el in wild_pokemon_encountered[starter]: tot += wild_pokemon_encountered[starter][el]
-        print(tot)
-
 
 def load_data(starter_list : int, file_name : str, n_games : int, n_battles : int) -> dict:
     outcome_counter = dict()
