@@ -37,12 +37,17 @@ class Game(game_engine.Game):
         outcome_counter = dict( win = 0, loss = 0)
         turns_per_battle = np.zeros(self.battle_to_simulate)
         percentage_hp_after_battle = np.zeros(self.battle_to_simulate)
+        battle_statistics = dict(
+            hp_during_battle = [],
+            damage_during_battle = [],
+            moves_during_battle = []
+        )
 
         for i in range(self.battle_to_simulate):
             # Spawn and fight wild pokemon
             wild_pokemon = self.get_wild_pokemon()
             battle = RandomBattle(self.starter, wild_pokemon, self.df_effectiveness)
-            battle_outcome, turns = battle.execute_battle()
+            battle_outcome, turns, single_battle_statistics = battle.execute_battle()
 
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
             # Save statistics
@@ -71,12 +76,15 @@ class Game(game_engine.Game):
             wild_pokemon_encountered[wild_pokemon.name]['percentage_hp_after_battle'].append(percentage_hp_after_battle[i])
             wild_pokemon_encountered[wild_pokemon.name]['turns'].append(turns)
 
+            battle_statistics['hp_during_battle'].append(single_battle_statistics['hp'])
+            battle_statistics['damage_during_battle'].append(single_battle_statistics['damage'])
+            battle_statistics['moves_during_battle'].append(single_battle_statistics['moves_used'])
+
             # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             # Go to pokemon center to heal
             self.pokemon_center()
 
-
-        return wild_pokemon_encountered, outcome_counter, turns_per_battle, percentage_hp_after_battle
+        return wild_pokemon_encountered, outcome_counter, turns_per_battle, percentage_hp_after_battle, battle_statistics
 
     def clean_moves(self):
         """
@@ -90,7 +98,7 @@ class Game(game_engine.Game):
         self.starter.base_stats['hp'] = self.starter.base_stats['max_hp']
         
         # Refil moves pp (not needed but put here just in case)
-        for move in self.starter.moves: move.pp = move.max_pp
+        # for move in self.starter.moves: move.pp = move.max_pp
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # Spawn pokemon methods
@@ -135,6 +143,12 @@ class RandomBattle(Battle.Battle):
     def execute_battle(self):
         continue_battle = True
         turns = 0
+        battle_statistics = dict(
+            hp = [],
+            moves_used = [],
+            damage = []
+        )
+
         while continue_battle:
             # Select a random move for pokemon 1
             moves_1 = self.trainer_1.pokemon_list[0].moves 
@@ -144,15 +158,27 @@ class RandomBattle(Battle.Battle):
             moves_2 = self.trainer_2.pokemon_list[0].moves
             idx_move_2 = random.randint(0, len(moves_2) - 1)
             
-            outcome = self.execute_both_moves(idx_move_1, idx_move_2, print_var = False)
+            outcome, info_first, info_second = self.execute_both_moves(idx_move_1, idx_move_2, print_var = False)
             exit_status_battle, continue_battle = self.eveluate_battle_outcome(outcome)
 
             self.recharge_pp(self.trainer_1.pokemon_list[0])
             self.recharge_pp(self.trainer_2.pokemon_list[0])
 
             turns += 1
+            
+            # Save the damage done
+            if info_first[1] == 1: # Faster pokemon = starter
+                battle_statistics['damage'].append(info_first[0])
+            else: # Slowest pokemon = starter (i.e. info_second[1] == 1 and info_first[1] == 2) 
+                battle_statistics['damage'].append(info_second[0]) 
+            
+            # Save the current hp
+            battle_statistics['hp'].append(self.trainer_1.pokemon_list[0].base_stats['hp']) 
 
-        return exit_status_battle, turns
+            # Save the move used
+            battle_statistics['moves_used'].append(moves_1[idx_move_1].name)
+
+        return exit_status_battle, turns, battle_statistics
 
     def recharge_pp(self, pokemon : "Pokemon"):
         for move in pokemon.moves: move.pp = move.max_pp
