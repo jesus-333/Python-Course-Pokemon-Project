@@ -97,4 +97,4 @@ if __name__ == '__main__':
         save_results(turns_per_battle[starter], "results/turns_per_battle" + suffix)
         save_results(percentage_hp_after_battle[starter], "results/percentage_hp_after_battle" + suffix)
         save_results(battle_statistics[starter], "results/battle_statistics" + suffix)
-        save_results(battle_statistics[starter], "results/ml_data" + suffix)
+        save_results(ml_data[starter], "results/ml_data" + suffix)
