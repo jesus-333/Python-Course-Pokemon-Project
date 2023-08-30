@@ -43,3 +43,5 @@ if __name__ == '__main__':
     plot_task_4.plot_pie_types(starter_list, wild_pokemon_encountered, df_pokemon)
 
     plot_task_4.plot_bar_chart_damage(starter_list, battle_statistics)
+    
+    input("Press Enter to close...")
