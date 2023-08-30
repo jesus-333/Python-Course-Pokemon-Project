@@ -46,4 +46,6 @@ if __name__ == '__main__':
     n_battles = int( sys.argv[2] )
 
     main(n_games, n_battles)
+    
+    input("Press Enter to close the program...")
 
