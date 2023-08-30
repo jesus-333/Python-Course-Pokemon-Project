@@ -1,5 +1,6 @@
 import sys
 import pickle
+import numpy as np
 
 from library import pokemon_recomendation_system as prs
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -21,10 +22,10 @@ if __name__ == '__main__':
 
     starter_list = [""]
     ml_data = load_data("ml_matrix", n_games, n_battles)
-    labels = load_data("labels", n_games, n_battles)
+    labels = np.array(load_data("labels", n_games, n_battles))
 
-    clf = LinearDiscriminantAnalysis()
-    clf.fit(ml_data, labels)
-    print(clf.score(ml_data, labels))
+    ml_model = LinearDiscriminantAnalysis()
+    ml_model.fit(ml_data, labels)
+    print(ml_model.score(ml_data, labels))
 
-    save_results(clf, "results/ml_model")
+    save_results(ml_model, "results/ml_model")

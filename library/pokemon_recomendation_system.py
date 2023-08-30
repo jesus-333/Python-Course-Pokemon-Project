@@ -52,3 +52,20 @@ def convert_ml_dict_to_matrix_and_labels(starter_list : list, ml_dict_per_starte
             idx += 1
 
     return tmp_matrix, labels
+
+def predict_win_prob(pokemon_stats : dict, enemy_types : list, ml_model):
+    type_to_int = get_types_list('data/pokemon_2.json')
+
+    x = []
+    for stats in pokemon_stats:
+        if stats != 'max_hp': 
+            x.append(pokemon_stats[stats])
+
+    if len(enemy_types) == 2:
+        x.append( type_to_int[enemy_types[0]] )
+        x.append( type_to_int[enemy_types[1]] )
+    else:
+        x.append( type_to_int[enemy_types[0]] )
+        x.append( 0 ) 
+
+    return ml_model.predict_proba(np.asarray(x).reshape(1, -1))[0]

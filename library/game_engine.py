@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
+import pickle
 
 from . import Pokemon, Trainer, support
+from . import pokemon_recomendation_system as prs
 from .Battle import Battle
 
 class Game():
@@ -17,7 +19,6 @@ class Game():
         else: 
             self.encounter_prob = encounter_prob
         self.keep_history = keep_history
-        self.keep_history = True
         
         # Dataframe with all the data of the json files
         self.df_pokemon = pd.read_json(pokemon_file_path)
@@ -27,6 +28,14 @@ class Game():
         # Create the trainer
         if selected_starter == -1: # Create only in normale mode. selected_starter is different from -1 only in random mode
             self.create_trainer()
+
+        try: 
+            pickle_in = open("results/ml_model.pickle", "rb")
+            self.ml_model = pickle.load(pickle_in)
+            pickle_in.close()
+        except:
+            print("ML model not found")
+            self.ml_model = None
 
     def create_trainer(self):
         support.clear()
@@ -83,8 +92,17 @@ class Game():
         
             print("You find a wild pokemon")
             print("The wild pokemon is a wild {}".format(wild_pokemon.name))
-            
-            battle = Battle(self.trainer, wild_trainer, use_ai_player_2 = True, keep_history = self.keep_history)
+
+            if self.ml_model is not None:
+                for pokemon in self.trainer.pokemon_list:
+                    probability = prs.predict_win_prob(pokemon.base_stats, wild_pokemon.types, self.ml_model) 
+                    if probability[0] < 0.5:
+                        print("{} has more than 50% of possibility to win the battle".format(pokemon.name))
+                    else:
+                        print("{} has less than 50% of possibility to win the battle".format(pokemon.name))
+                input("Press Enter to continue...")
+
+            battle = Battle(self.trainer, wild_trainer, use_ai_player_2 = True, keep_history = self.keep_history, df_effectiveness = self.df_effectiveness)
             battle_outcome = battle.battle()
 
             if battle_outcome == 1 or battle_outcome == 3:
